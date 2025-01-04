@@ -8,6 +8,9 @@ WORKDIR /app
 # 将 Go 代码复制到容器中
 COPY main.go .
 
+# 打印调试信息
+RUN echo "Building for architecture: $TARGETARCH"
+
 # 编译 Go 程序，并静态链接以减小二进制文件大小
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o hello .
 
