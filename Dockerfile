@@ -1,5 +1,5 @@
 
-FROM --platform=$BUILDPLATFORM golang:1.20-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
 
 ARG TARGETARCH
 # 禁用 Go Modules
