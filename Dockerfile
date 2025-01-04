@@ -9,6 +9,7 @@ WORKDIR /app
 COPY main.go .
 
 # 打印调试信息
+ARG TARGETARCH
 RUN echo "Building for architecture: $TARGETARCH"
 
 # 编译 Go 程序，并静态链接以减小二进制文件大小
