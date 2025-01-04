@@ -8,6 +8,9 @@ WORKDIR /app
 # 将 Go 代码复制到容器中
 COPY main.go .
 
+# 禁用 Go Modules
+ENV GO111MODULE=off
+
 # 打印调试信息
 ARG TARGETARCH
 RUN echo "Building for architecture: $TARGETARCH"
