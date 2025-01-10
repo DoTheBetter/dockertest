@@ -8,7 +8,7 @@ RUN apk add --no-cache make build-base \
 	&& cd /vlmcsd-svn${VLMCSD_VER} \
 	&& make \
 # 显示版本
-	&& /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd -V
+	&& /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd -h
 
 
 FROM alpine:3.21
