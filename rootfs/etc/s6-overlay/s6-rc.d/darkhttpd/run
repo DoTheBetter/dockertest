@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/command/with-contenv sh
 
 #启动darkhttpd
 if [ "$WEB" == "true" ]; then

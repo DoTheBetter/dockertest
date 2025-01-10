@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/command/with-contenv sh
 
 echo "正在停止 vlmcsd 服务..."
 pkill vlmcsd
