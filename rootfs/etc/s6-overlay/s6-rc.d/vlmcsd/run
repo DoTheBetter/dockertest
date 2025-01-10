@@ -1,0 +1,4 @@
+#!/bin/sh
+
+#启动vlmcsd
+exec s6-setuidgid kms vlmcsd -i /etc/vlmcsd.ini -D
