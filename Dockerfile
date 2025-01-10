@@ -14,6 +14,7 @@ RUN apk add --no-cache make build-base \
 FROM alpine:3.21
 
 ARG S6_VER=3.2.0.2
+ARG VLMCSD_VER=1113
 
 ENV TZ=Asia/Shanghai \
 	WEB=true
