@@ -6,7 +6,7 @@ RUN apk add --no-cache make build-base \
 	&& wget https://github.com/Wind4/vlmcsd/archive/refs/tags/svn${VLMCSD_VER}.tar.gz \
 	&& tar -zxf svn${VLMCSD_VER}.tar.gz \
 	&& cd /vlmcsd-svn${VLMCSD_VER} \
-	&& make
+	&& make \
 # 显示版本
 	&& /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd -h
 
