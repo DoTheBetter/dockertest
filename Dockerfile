@@ -3,7 +3,7 @@ FROM alpine:3.21 AS builder
 ARG VLMCSD_VER=1113
 
 RUN apk add --no-cache make build-base \
-	&& wget https://github.com/Wind4/vlmcsd/archive/refs/tags/svn${VLMCSD_VER}.tar.gz \
+	&& wget wget https://github.com/Wind4/vlmcsd/archive/svn${VLMCSD_VER}.tar.gz \
 	&& tar -zxf svn${VLMCSD_VER}.tar.gz \
 	&& cd /vlmcsd-svn${VLMCSD_VER} \
 	&& make \
