@@ -1,26 +1,24 @@
 FROM alpine:3.21 AS builder
 
-ARG VLMCSD_VER=1113
-
-RUN apk add --no-cache make build-base \
-	&& wget https://github.com/Wind4/vlmcsd/archive/svn${VLMCSD_VER}.tar.gz \
-	&& tar -zxf svn${VLMCSD_VER}.tar.gz \
-	&& cd /vlmcsd-svn${VLMCSD_VER} \
+WORKDIR /root
+RUN apk add --no-cache git make build-base \
+	&& git clone --branch master --single-branch https://github.com/Wind4/vlmcsd.git \
+	&& cd vlmcsd/ \
 	&& make \
 # 显示版本
-	&& /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd -h
+	&& /root/vlmcsd/bin/vlmcsd -h
 
 
 FROM alpine:3.21
 
 ARG S6_VER=3.2.0.2
-ARG VLMCSD_VER=1113
+
 
 ENV TZ=Asia/Shanghai \
 	WEB=true
 
 COPY --chmod=755 rootfs /
-COPY --from=builder --chmod=755 /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd /usr/bin/vlmcsd
+COPY --from=builder --chmod=755 /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd
 
 RUN set -ex \
 # 安装应用
