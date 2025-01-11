@@ -15,7 +15,6 @@ RUN apk add --no-cache p7zip coreutils make build-base \
     && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd -p2020 \
     && cd /root/vlmcsd \
     && make \
-    && echo "Make completed successfully" || { echo "Make failed"; exit 1; } \
     && cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
     && chmod +x /usr/bin/vlmcsd \
     && vlmcsd -V
