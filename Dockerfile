@@ -4,6 +4,7 @@ WORKDIR /root
 
 COPY --chmod=755 backupfiles/ /root/
 
+# 安装依赖（包括交叉编译工具）
 RUN apk add --no-cache p7zip coreutils make build-base gcc musl-dev
 
 # 检查 SHA256 值，不匹配则退出并输出错误信息
@@ -13,15 +14,31 @@ RUN sha256_actual=$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{
         echo "Error: SHA256 checksum mismatch! Actual: $sha256_actual, Expected: $sha256_expected"; \
         exit 1; \
     fi
+
 # 解压文件
 RUN mkdir -p /root/vlmcsd \
     && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd -p2020
+
+# 根据目标平台设置交叉编译工具链
+ARG TARGETARCH
+ARG TARGETVARIANT
+RUN case "${TARGETARCH}-${TARGETVARIANT}" in \
+      "amd64-") export CC=gcc ;; \
+      "arm64-") export CC=aarch64-linux-musl-gcc ;; \
+      "arm-v7") export CC=arm-linux-gnueabihf-gcc ;; \
+      *) echo "Unsupported platform: ${TARGETARCH}-${TARGETVARIANT}"; exit 1 ;; \
+    esac
+
 # 编译
 RUN cd /root/vlmcsd \
-    && make
+    && make CC=$CC \
+    && echo "Make completed successfully" \
+    || { echo "Make failed"; exit 1; }
+
 # 复制二进制文件并设置权限
 RUN cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
     && chmod +x /usr/bin/vlmcsd
+
 # 测试二进制文件
 RUN vlmcsd -h
 
