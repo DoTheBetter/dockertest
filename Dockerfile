@@ -15,7 +15,7 @@ RUN sha256_actual=$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{
     fi
 # 解压文件
 RUN mkdir -p /root/vlmcsd \
-    && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd
+    && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd -p2020
 # 编译
 RUN cd /root/vlmcsd \
     && make \
