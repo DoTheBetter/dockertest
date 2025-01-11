@@ -1,7 +1,7 @@
 #!/command/with-contenv sh
 
-#启动darkhttpd
 if [ "$WEB" == "true" ]; then
+  echo "正在启动 darkhttpd 服务..."
   exec s6-setuidgid http darkhttpd /www --port 8080
 else
   echo "未设置启动 darkhttpd 服务，退出！"

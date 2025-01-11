@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/command/with-contenv sh
 
 echo "正在运行初始化任务..."
 

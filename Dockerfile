@@ -1,23 +1,30 @@
 FROM alpine:3.21 AS builder
 
-ARG VLMCSD_VER=1113
+WORKDIR /root
+COPY --chmod=755 backupfiles/ /root/
 
-RUN apk add --no-cache make build-base \
-	&& wget https://github.com/Wind4/vlmcsd/archive/refs/tags/svn${VLMCSD_VER}.tar.gz \
-	&& tar -zxf svn${VLMCSD_VER}.tar.gz \
-	&& cd /vlmcsd-svn${VLMCSD_VER} \
-	&& make
+RUN apk add --no-cache p7zip coreutils make build-base \
+# 检查 SHA256 值，不匹配则退出
+	&& [ "$(sha256sum vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}')" = "$(cat SHA256.txt)" ] || exit 1 \
+# 解压
+	&& mkdir -p /root/vlmcsd \
+	&& 7z x vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd \
+# 编译并检查
+	&& cd /root/vlmcsd \
+	&& make \
+	&& cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
+	&& vlmcsd -h
+
 
 FROM alpine:3.21
 
 ARG S6_VER=3.2.0.2
-ARG VLMCSD_VER=1113
 
 ENV TZ=Asia/Shanghai \
 	WEB=true
 
 COPY --chmod=755 rootfs /
-COPY --from=builder --chmod=755 /vlmcsd-svn${VLMCSD_VER}/bin/vlmcsd /usr/bin/vlmcsd
+COPY --from=builder --chmod=755 /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd
 
 RUN set -ex \
 # 安装应用
