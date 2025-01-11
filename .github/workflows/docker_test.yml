@@ -1,10 +1,10 @@
 name: dockertest
 
 on:
-  #push:
-  #  paths:
-  #  - 'Dockerfile'
-  #  - 'rootfs/**'
+  push:
+    paths:
+    - 'Dockerfile'
+    - 'rootfs/**'
   workflow_dispatch:
 
 jobs:
