@@ -1,18 +1,25 @@
 FROM alpine:3.21 AS builder
 
 WORKDIR /root
+
 COPY --chmod=755 backupfiles/ /root/
 
-RUN apk add --no-cache p7zip coreutils make build-base \
-# 检查 SHA256 值，不匹配则退出
-	&& [ "$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}')" = "$(cat /root/SHA256.txt)" ] || exit 1 \
-# 解压
-	&& mkdir -p /root/vlmcsd \
-	&& 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd \
-# 编译并检查
-	&& cd /root/vlmcsd \
-	&& make \
-	&& cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
+RUN apk add --no-cache p7zip coreutils make build-base
+
+# 检查 SHA256 值，不匹配则退出并输出错误信息
+RUN sha256_actual=$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}') \
+    && sha256_expected=$(cat /root/SHA256.txt) \
+    && if [ "$sha256_actual" != "$sha256_expected" ]; then \
+        echo "Error: SHA256 checksum mismatch! Actual: $sha256_actual, Expected: $sha256_expected"; \
+        exit 1; \
+    fi
+# 解压文件
+RUN mkdir -p /root/vlmcsd \
+    && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd
+# 编译
+RUN cd /root/vlmcsd \
+    && make \
+    && cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
 	&& vlmcsd -h
 
 
