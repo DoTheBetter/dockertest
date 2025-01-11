@@ -5,10 +5,10 @@ COPY --chmod=755 backupfiles/ /root/
 
 RUN apk add --no-cache p7zip coreutils make build-base \
 # 检查 SHA256 值，不匹配则退出
-	&& [ "$(sha256sum vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}')" = "$(cat SHA256.txt)" ] || exit 1 \
+	&& [ "$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}')" = "$(cat /root/SHA256.txt)" ] || exit 1 \
 # 解压
 	&& mkdir -p /root/vlmcsd \
-	&& 7z x vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd \
+	&& 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd \
 # 编译并检查
 	&& cd /root/vlmcsd \
 	&& make \
