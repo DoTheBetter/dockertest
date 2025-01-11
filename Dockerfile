@@ -20,6 +20,7 @@ RUN mkdir -p /root/vlmcsd \
 RUN cd /root/vlmcsd \
     && make \
     && cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
+	&& chmod +x /usr/bin/vlmcsd \
 	&& vlmcsd -h
 
 
