@@ -1,0 +1,2 @@
+#!/command/with-contenv sh
+exec s6-log -b -- /dev/stdout  # 将日志发送到 stdout

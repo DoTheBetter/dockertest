@@ -2,4 +2,5 @@
 
 echo "+正在启动 vlmcsd 服务..."
 echo "启动命令：\"vlmcsd -i /vlmcsd/vlmcsd.ini -D\""
+exec 2>&1  # 将 stderr 重定向到 stdout
 exec s6-setuidgid kms vlmcsd -i /vlmcsd/vlmcsd.ini -D

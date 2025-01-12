@@ -1,3 +1,5 @@
+ARG KMS_VER=20250112
+
 FROM alpine:3.21 AS builder
 
 WORKDIR /root

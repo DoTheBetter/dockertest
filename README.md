@@ -10,9 +10,11 @@
 <img alt="Docker Image Size" src="https://img.shields.io/docker/image-size/dothebetter/kms?label=Image%20Size">
 <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/dothebetter/kms?label=Docker%20Pulls">
 </p>
-自用KMS激活 Alpine镜像，支持amd64;arm64v8;arm32v7系统。
+为实现自用的KMS激活功能，构建了一个基于Alpine镜像的服务，支持多种架构，包括amd64、arm64v8和arm32v7。
 
-使用`vlmcsd -i /vlmcsd/vlmcsd.ini -D`启动服务，方便后期修改启动参数。带有web说明界面。
+KMS服务通过命令行`vlmcsd -i /vlmcsd/vlmcsd.ini -D -e`来启动，便于后期根据需要修改启动参数，**注意：命令行参数优先**。
+
+同时，该服务还提供了基于Web的说明界面，方便用户参考操作。
 
 项目地址：https://github.com/DoTheBetter/docker/tree/master/kms
 
