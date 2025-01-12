@@ -2,6 +2,8 @@
 Windows 版本：[Windows](https://learn.microsoft.com/zh-cn/windows-server/get-started/kms-client-activation-keys)  
 Office 版本：[Office 2016-2024](https://docs.microsoft.com/zh-cn/DeployOffice/vlactivation/gvlks)，[Office 2013](https://docs.microsoft.com/zh-cn/previous-versions/office/dn385360(v=office.15)?redirectedfrom=MSDN)，[Office 2010](https://docs.microsoft.com/zh-cn/previous-versions/office/office-2010/ee624355(v=office.14)?redirectedfrom=MSDN)
 
+本页同步更新官方秘钥时间：2025-1-12
+
 
 ## Windows 11 和 Windows 10 半年频道
 
