@@ -27,6 +27,7 @@ FROM alpine:3.21
 ARG S6_VER=3.2.0.2
 
 ENV TZ=Asia/Shanghai \
+    VLKMCSD_OPTS="-i /vlmcsd/vlmcsd.ini -D -e" \
 	WEB=true \
 	S6_VERBOSITY=1
 
