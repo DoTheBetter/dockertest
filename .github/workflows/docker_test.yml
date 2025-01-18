@@ -38,6 +38,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Aliyun Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -48,3 +55,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/dothebetter/dockertest:${{ env.DOCKERTEST_VER }}
+            registry.cn-hangzhou.aliyuncs.com/dothebetter/dockertest:${{ env.DOCKERTEST_VER }}
