@@ -14,6 +14,3 @@ chmod -R 755 /vlmcsd
 
 chown -R http:http /www
 chmod -R 755 /www
-
-
-#cat /etc/s6-overlay/s6-rc.d/init/00-banner.txt
