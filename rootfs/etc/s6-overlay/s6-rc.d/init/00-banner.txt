@@ -1,6 +1,6 @@
  
 ------------------------------------
-
+ 
 ██╗  ██╗    ███╗   ███╗    ███████╗
 ██║ ██╔╝    ████╗ ████║    ██╔════╝
 █████╔╝     ██╔████╔██║    ███████╗
@@ -9,9 +9,9 @@
 ╚═╝  ╚═╝    ╚═╝     ╚═╝    ╚══════╝
                                    
 https://github.com/DoTheBetter/docker
-
+ 
 DockerVersion: KMS_VER | Build Time: DATE_TIME
-
+ 
 vlmcsd: VLMCSD_VER | darkhttpd: DARKHTTPD_VER
 ------------------------------------
-
+ 
