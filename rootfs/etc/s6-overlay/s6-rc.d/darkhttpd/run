@@ -6,5 +6,6 @@ if [ "$WEB" == "true" ]; then
   exec s6-setuidgid http darkhttpd /www --port 8080
 else
   echo "+未设置启动 darkhttpd 服务，退出！"
+  s6-svc -Od .
   exit 0
 fi
