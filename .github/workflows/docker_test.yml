@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "DOCKERTEST_VER=test" >> $GITHUB_ENV
           sed -i "s@KMS_VER@$(echo `grep -n "KMS_VER=" Dockerfile`|awk -F= '{print $2}')@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
-          sed -i "s@DATE_TIME@$(date)@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
+          sed -i "s@DATE_TIME@$(date +"%Y/%m/%d %H:%M")@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
           sed -i "s@VLMCSD_VER@$(echo `grep -n "VLMCSD_VER=" Dockerfile`|awk -F= '{print $2}')@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
           sed -i "s@DARKHTTPD_VER@$(echo `grep -n "DARKHTTPD_VER=" Dockerfile`|awk -F= '{print $2}')@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
           cat rootfs/etc/s6-overlay/s6-rc.d/init/00-banner.txt
