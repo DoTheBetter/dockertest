@@ -1,62 +1,64 @@
-ARG KMS_VER=20250114
-ARG VLMCSD_VER=1113
-ARG DARKHTTPD_VER=1.16
+# 使用 Alpine Linux 作为基础镜像
+FROM alpine:latest AS builder
 
-FROM alpine:3.21 AS builder
+# 安装必要的依赖
+RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
+    libssh2-dev zlib-dev c-ares-dev libxml2-dev sqlite-dev openssl-dev \
+    nettle-dev gmp-dev expat-dev
 
-WORKDIR /root
+# 安装交叉编译工具链
+RUN apk add --no-cache crossbuild-essential-amd64 crossbuild-essential-arm64 crossbuild-essential-armhf
 
-COPY --chmod=755 backupfiles/ /root/
+# 克隆 aria2 源代码
+RUN git clone https://github.com/aria2/aria2.git /aria2
+WORKDIR /aria2
 
-RUN apk add --no-cache p7zip coreutils make build-base \
-    && sha256_actual=$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}') \
-    && sha256_expected=$(cat /root/SHA256.txt) \
-    && if [ "$sha256_actual" != "$sha256_expected" ]; then \
-        echo "Error: SHA256 checksum mismatch! Actual: $sha256_actual, Expected: $sha256_expected"; \
-        exit 1; \
-    fi \
-    && mkdir -p /root/vlmcsd \
-    && 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd -p2020 \
-    && cd /root/vlmcsd \
-    && make \
-    && cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
-    && chmod +x /usr/bin/vlmcsd \
-    && vlmcsd -V
+# 自动判断系统类型并设置交叉编译环境
+ARG TARGETARCH
+RUN case "$TARGETARCH" in \
+    "amd64") \
+        export CC=x86_64-alpine-linux-musl-gcc \
+        export CXX=x86_64-alpine-linux-musl-g++ \
+        export AR=x86_64-alpine-linux-musl-ar \
+        export RANLIB=x86_64-alpine-linux-musl-ranlib \
+        export LD=x86_64-alpine-linux-musl-ld \
+        ;; \
+    "arm64") \
+        export CC=aarch64-alpine-linux-musl-gcc \
+        export CXX=aarch64-alpine-linux-musl-g++ \
+        export AR=aarch64-alpine-linux-musl-ar \
+        export RANLIB=aarch64-alpine-linux-musl-ranlib \
+        export LD=aarch64-alpine-linux-musl-ld \
+        ;; \
+    "arm") \
+        export CC=armv7-alpine-linux-musleabihf-gcc \
+        export CXX=armv7-alpine-linux-musleabihf-g++ \
+        export AR=armv7-alpine-linux-musleabihf-ar \
+        export RANLIB=armv7-alpine-linux-musleabihf-ranlib \
+        export LD=armv7-alpine-linux-musleabihf-ld \
+        ;; \
+    *) \
+        echo "Unsupported architecture: $TARGETARCH" && exit 1 \
+        ;; \
+    esac
 
+# 配置和编译 aria2
+RUN autoreconf -i && \
+    ./configure --host=$TARGETARCH-alpine-linux-musl --prefix=/usr/local --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt && \
+    make -j$(nproc) && \
+    make install DESTDIR=/output
 
-FROM alpine:3.21
+# 最终阶段：创建一个轻量级的镜像
+FROM alpine:latest
 
-ARG S6_VER=3.2.0.2
+# 复制编译好的 aria2 二进制文件
+COPY --from=builder /output/usr/local/bin/aria2c /usr/local/bin/aria2c
 
-ENV TZ=Asia/Shanghai \
-    VLKMCSD_OPTS="-i /vlmcsd/vlmcsd.ini -D -e" \
-	WEB=true \
-	S6_VERBOSITY=1
+# 设置 CA 证书
+RUN apk add --no-cache ca-certificates
 
-COPY --chmod=755 rootfs /
-COPY --from=builder --chmod=755 /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd
+# 验证 aria2 是否正常工作
+RUN aria2c --version
 
-RUN set -ex \
-# 安装应用
-	&& apk add --no-cache ca-certificates tzdata darkhttpd \
-# 安装s6-overlay	
-	&& if [ "$(uname -m)" = "x86_64" ];then s6_arch=x86_64;elif [ "$(uname -m)" = "aarch64" ];then s6_arch=aarch64;elif [ "$(uname -m)" = "armv7l" ];then s6_arch=arm; fi \
-	&& wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-noarch.tar.xz \
-	&& tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
-	&& wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-${s6_arch}.tar.xz \
-	&& tar -C / -Jxpf /tmp/s6-overlay-${s6_arch}.tar.xz \
-# 创建kms用户组,创建无密码、无登录权限的用户
-	&& addgroup kms \
-	&& adduser -D -H -G kms -s /sbin/nologin kms \
-# 创建http用户及组
-	&& addgroup http \
-	&& adduser -D -H -G http -s /sbin/nologin http \
-# 清除缓存
-	&& rm -rf /var/cache/apk/* \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /tmp/* \
-	&& rm -rf /var/tmp/* \
-	&& rm -rf $HOME/.cache
-
-EXPOSE 1688 8080
-ENTRYPOINT [ "/init" ]
+# 设置默认命令
+CMD ["aria2c"]
