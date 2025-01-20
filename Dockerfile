@@ -1,16 +1,21 @@
 # 使用 Alpine Linux 作为基础镜像
 FROM alpine:latest AS builder
 
-# 启用 community 仓库
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
-
 # 安装必要的依赖
 RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
     libssh2-dev zlib-dev c-ares-dev libxml2-dev sqlite-dev openssl-dev \
-    nettle-dev gmp-dev expat-dev
+    nettle-dev gmp-dev expat-dev curl tar xz
 
-# 安装交叉编译工具链
-RUN apk add --no-cache gcc-aarch64-linux-musl gcc-arm-linux-musleabihf
+# 手动下载并安装交叉编译工具链
+# 下载 aarch64 工具链
+RUN curl -L -o /tmp/aarch64-linux-musl-cross.tar.xz https://musl.cc/aarch64-linux-musl-cross.tgz && \
+    tar -xf /tmp/aarch64-linux-musl-cross.tar.xz -C /usr/local --strip-components=1 && \
+    rm /tmp/aarch64-linux-musl-cross.tar.xz
+
+# 下载 armhf 工具链
+RUN curl -L -o /tmp/arm-linux-musleabihf-cross.tar.xz https://musl.cc/arm-linux-musleabihf-cross.tgz && \
+    tar -xf /tmp/arm-linux-musleabihf-cross.tar.xz -C /usr/local --strip-components=1 && \
+    rm /tmp/arm-linux-musleabihf-cross.tar.xz
 
 # 克隆 aria2 源代码
 RUN git clone https://github.com/aria2/aria2.git /aria2
