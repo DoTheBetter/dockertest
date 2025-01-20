@@ -50,14 +50,18 @@ RUN case "$TARGETARCH" in \
         ;; \
     esac
 
-# 配置和编译 aria2
+# 配置和编译 aria2，使用 OpenSSL
 RUN autoreconf -i && \
-    ./configure --host=$TARGETARCH-linux-musl --prefix=/usr/local --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt && \
+    ./configure --host=$TARGETARCH-linux-musl --prefix=/usr/local \
+        --with-openssl --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt && \
     make -j$(nproc) && \
     make install DESTDIR=/output
 
 # 最终阶段：创建一个轻量级的镜像
 FROM alpine:latest
+
+# 安装 libstdc++ 以支持 C++ 标准库
+RUN apk add --no-cache libstdc++
 
 # 复制编译好的 aria2 二进制文件
 COPY --from=builder /output/usr/local/bin/aria2c /usr/local/bin/aria2c
