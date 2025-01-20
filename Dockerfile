@@ -61,7 +61,7 @@ RUN autoreconf -i && \
 FROM alpine:latest
 
 # 安装 aria2c 依赖的运行时库
-RUN apk add --no-cache libstdc++ libssh2 c-ares sqlite libxml2 openssl
+RUN apk add --no-cache libstdc++ libssh2 c-ares sqlite libxml2 openssl gettext
 
 # 复制编译好的 aria2 二进制文件
 COPY --from=builder /output/usr/local/bin/aria2c /usr/local/bin/aria2c
