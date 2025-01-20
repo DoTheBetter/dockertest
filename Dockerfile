@@ -10,7 +10,7 @@ RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
     nettle-dev gmp-dev expat-dev
 
 # 安装交叉编译工具链
-RUN apk add --no-cache gcc-aarch64-linux-musl gcc-armhf-linux-musleabihf
+RUN apk add --no-cache gcc-aarch64-linux-musl gcc-arm-linux-musleabihf
 
 # 克隆 aria2 源代码
 RUN git clone https://github.com/aria2/aria2.git /aria2
