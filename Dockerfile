@@ -7,7 +7,7 @@ RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
     nettle-dev gmp-dev expat-dev
 
 # 安装交叉编译工具链
-RUN apk add --no-cache crossbuild-essential-x86_64 crossbuild-essential-aarch64 crossbuild-essential-armhf
+RUN apk add --no-cache gcc-aarch64-linux-musl gcc-armhf-linux-musleabihf
 
 # 克隆 aria2 源代码
 RUN git clone https://github.com/aria2/aria2.git /aria2
@@ -17,25 +17,25 @@ WORKDIR /aria2
 ARG TARGETARCH
 RUN case "$TARGETARCH" in \
     "amd64") \
-        export CC=x86_64-alpine-linux-musl-gcc \
-        export CXX=x86_64-alpine-linux-musl-g++ \
-        export AR=x86_64-alpine-linux-musl-ar \
-        export RANLIB=x86_64-alpine-linux-musl-ranlib \
-        export LD=x86_64-alpine-linux-musl-ld \
+        export CC=gcc \
+        export CXX=g++ \
+        export AR=ar \
+        export RANLIB=ranlib \
+        export LD=ld \
         ;; \
     "arm64") \
-        export CC=aarch64-alpine-linux-musl-gcc \
-        export CXX=aarch64-alpine-linux-musl-g++ \
-        export AR=aarch64-alpine-linux-musl-ar \
-        export RANLIB=aarch64-alpine-linux-musl-ranlib \
-        export LD=aarch64-alpine-linux-musl-ld \
+        export CC=aarch64-linux-musl-gcc \
+        export CXX=aarch64-linux-musl-g++ \
+        export AR=aarch64-linux-musl-ar \
+        export RANLIB=aarch64-linux-musl-ranlib \
+        export LD=aarch64-linux-musl-ld \
         ;; \
     "arm") \
-        export CC=armv7-alpine-linux-musleabihf-gcc \
-        export CXX=armv7-alpine-linux-musleabihf-g++ \
-        export AR=armv7-alpine-linux-musleabihf-ar \
-        export RANLIB=armv7-alpine-linux-musleabihf-ranlib \
-        export LD=armv7-alpine-linux-musleabihf-ld \
+        export CC=arm-linux-musleabihf-gcc \
+        export CXX=arm-linux-musleabihf-g++ \
+        export AR=arm-linux-musleabihf-ar \
+        export RANLIB=arm-linux-musleabihf-ranlib \
+        export LD=arm-linux-musleabihf-ld \
         ;; \
     *) \
         echo "Unsupported architecture: $TARGETARCH" && exit 1 \
@@ -44,7 +44,7 @@ RUN case "$TARGETARCH" in \
 
 # 配置和编译 aria2
 RUN autoreconf -i && \
-    ./configure --host=$TARGETARCH-alpine-linux-musl --prefix=/usr/local --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt && \
+    ./configure --host=$TARGETARCH-linux-musl --prefix=/usr/local --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt && \
     make -j$(nproc) && \
     make install DESTDIR=/output
 
