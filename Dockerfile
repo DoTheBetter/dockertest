@@ -7,7 +7,7 @@ RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
     nettle-dev gmp-dev expat-dev
 
 # 安装交叉编译工具链
-RUN apk add --no-cache crossbuild-essential-amd64 crossbuild-essential-arm64 crossbuild-essential-armhf
+RUN apk add --no-cache crossbuild-essential-x86_64 crossbuild-essential-aarch64 crossbuild-essential-armhf
 
 # 克隆 aria2 源代码
 RUN git clone https://github.com/aria2/aria2.git /aria2
