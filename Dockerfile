@@ -1,6 +1,9 @@
 # 使用 Alpine Linux 作为基础镜像
 FROM alpine:latest AS builder
 
+# 启用 community 仓库
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+
 # 安装必要的依赖
 RUN apk add --no-cache build-base git autoconf automake libtool gettext-dev \
     libssh2-dev zlib-dev c-ares-dev libxml2-dev sqlite-dev openssl-dev \
