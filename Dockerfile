@@ -60,8 +60,8 @@ RUN autoreconf -i && \
 # 最终阶段：创建一个轻量级的镜像
 FROM alpine:latest
 
-# 安装 libstdc++ 以支持 C++ 标准库
-RUN apk add --no-cache libstdc++
+# 安装 aria2c 依赖的运行时库
+RUN apk add --no-cache libstdc++ libssh2 c-ares sqlite libxml2 openssl
 
 # 复制编译好的 aria2 二进制文件
 COPY --from=builder /output/usr/local/bin/aria2c /usr/local/bin/aria2c
