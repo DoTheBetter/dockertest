@@ -22,6 +22,10 @@ if [ "$SSH" == "true" ]; then
     chmod 0700 /conf/.ssh
     ln -sf /conf/.ssh /root/.ssh
 
+    # 启动dev服务
+    rc-update add dev sysinit
+    rc-service dev start
+
     # 生成SSH主机密钥
     ssh-keygen -A
 
@@ -38,8 +42,15 @@ if [ "$SSH" == "true" ]; then
     chmod 0600 /conf/.ssh/authorized_keys
 
     # 启动SSH服务
+    #rc-status
+    #touch /run/openrc/softlevel
+	#rc-update add sshd
+	#rc-service sshd start
+	
+    # 启动SSH服务
     rc-status
     touch /run/openrc/softlevel
+    rc-update add sshd
     rc-service sshd restart
 
     echo "SSH服务已启用"
@@ -68,7 +79,6 @@ fi
 
 echo "4.配置rsync"
 #显示信息
-echo "当前rsync版本："
 echo `rsync --version`
 
 if [ ! -e "/conf/rsync.password.example" ]; then
@@ -81,7 +91,8 @@ if [ "$RSYNC" == "true" ]; then
     if [ ! -e "/conf/rsyncd.conf" ]; then
         cp -f /rsyncd.conf.server /conf/rsyncd.conf
     fi
-    
+    ln -sf /conf/rsyncd.conf /etc/rsyncd.conf
+	
     # 首次运行复制rsync密码文件
     if [ ! -e "/conf/rsync.password" ]; then
         cp -f /rsync.password /conf/rsync.password
