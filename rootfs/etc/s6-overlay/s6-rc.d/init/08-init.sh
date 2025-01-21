@@ -74,9 +74,6 @@ else
 fi
 
 echo "4.配置rsync"
-#显示信息
-echo `rsync --version`
-
 if [ ! -e "/conf/rsync.password.example" ]; then
     cp -f /rsync.password.example /conf/rsync.password.example
 fi
