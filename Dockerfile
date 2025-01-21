@@ -7,11 +7,12 @@ ENV TZ=Asia/Shanghai \
 	SSH=false \
 	CRON=false \
 	RSYNC=false \
-	LSYNCD=false
+	LSYNCD=false \
+	S6_VERBOSITY=1
 
 COPY --chmod=755 rootfs /
 
-RUN set -ex \
+RUN set +ex \
 # 安装应用
 	&& apk add --no-cache tzdata lsyncd openssh openrc \
 	&& apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main rsync \

@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv sh
+#!/command/with-contenv sh
 
 if [ "$LSYNCD" = "true" ]; then
     echo "+已开启Lsyncd守护进程，请编辑/conf/lsyncd.conf配置文件..."
