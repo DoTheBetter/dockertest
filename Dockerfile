@@ -12,6 +12,7 @@ ENV TZ=Asia/Shanghai \
 
 COPY --chmod=755 rootfs /
 
+# 关闭调试输出
 RUN set +ex \
 # 安装应用
 	&& apk add --no-cache tzdata lsyncd openssh openrc \
