@@ -87,7 +87,6 @@ if [ "$RSYNC" == "true" ]; then
     if [ ! -e "/conf/rsyncd.conf" ]; then
         cp -f /rsyncd.conf.server /conf/rsyncd.conf
     fi
-    #ln -sf /conf/rsyncd.conf /etc/rsyncd.conf
 	
     # 首次运行复制rsync密码文件
     if [ ! -e "/conf/rsync.password" ]; then
