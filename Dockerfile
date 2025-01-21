@@ -1,6 +1,7 @@
 ARG RSYNC_VER=3.4.1
 
-FROM alpine:3.21
+FROM alpine:edge
+
 ARG S6_VER=3.2.0.2
 
 ENV TZ=Asia/Shanghai \
@@ -15,7 +16,7 @@ COPY --chmod=755 rootfs /
 # 关闭调试输出
 RUN set +ex \
 # 安装应用
-	&& apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main tzdata lsyncd rsync openssh openrc \
+	&& apk add --no-cache tzdata lsyncd rsync openssh openrc \
 # 安装s6-overlay	
 	&& if [ "$(uname -m)" = "x86_64" ];then s6_arch=x86_64;elif [ "$(uname -m)" = "aarch64" ];then s6_arch=aarch64;elif [ "$(uname -m)" = "armv7l" ];then s6_arch=arm; fi \
 	&& wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-noarch.tar.xz \
