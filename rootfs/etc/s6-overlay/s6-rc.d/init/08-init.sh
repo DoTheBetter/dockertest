@@ -22,10 +22,6 @@ if [ "$SSH" == "true" ]; then
     chmod 0700 /conf/.ssh
     ln -sf /conf/.ssh /root/.ssh
 
-    # 启动dev服务
-    rc-update add dev sysinit
-    rc-service dev start
-
     # 生成SSH主机密钥
     ssh-keygen -A
 
@@ -41,17 +37,26 @@ if [ "$SSH" == "true" ]; then
     chown root:root /conf/.ssh/authorized_keys
     chmod 0600 /conf/.ssh/authorized_keys
 
-    # 启动SSH服务
-    #rc-status
-    #touch /run/openrc/softlevel
-	#rc-update add sshd
-	#rc-service sshd start
+    # 初始化 OpenRC（如果尚未初始化）
+    if [ ! -e "/run/openrc/softlevel" ]; then
+        echo "Initializing OpenRC..."
+        mkdir -p /run/openrc
+        touch /run/openrc/softlevel
+    fi
+
+    # 忽略 dev 服务
+    echo "Disabling dev service dependency..."
+    if [ -e /etc/init.d/hwdrivers ]; then
+        sed -i '/need dev/d' /etc/init.d/hwdrivers
+    fi
+    if [ -e /etc/init.d/machine-id ]; then
+        sed -i '/need dev/d' /etc/init.d/machine-id
+    fi
 	
     # 启动SSH服务
     rc-status
-    touch /run/openrc/softlevel
     rc-update add sshd
-    rc-service sshd restart
+    rc-service sshd start
 
     echo "SSH服务已启用"
     echo "SSH密钥位于 /conf/.ssh 目录中"

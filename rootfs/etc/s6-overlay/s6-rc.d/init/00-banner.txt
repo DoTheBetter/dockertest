@@ -14,4 +14,3 @@ Docker版本: RSYNC_VER | 构建时间: DATE_TIME
  
 rsync版本: RSYNC_VER
 ------------------------------------
- 
