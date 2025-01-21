@@ -39,18 +39,9 @@ if [ "$SSH" == "true" ]; then
 
     # 初始化 OpenRC（如果尚未初始化）
     if [ ! -e "/run/openrc/softlevel" ]; then
-        echo "Initializing OpenRC..."
+        echo "初始化 OpenRC..."
         mkdir -p /run/openrc
         touch /run/openrc/softlevel
-    fi
-
-    # 忽略 dev 服务
-    echo "Disabling dev service dependency..."
-    if [ -e /etc/init.d/hwdrivers ]; then
-        sed -i '/need dev/d' /etc/init.d/hwdrivers
-    fi
-    if [ -e /etc/init.d/machine-id ]; then
-        sed -i '/need dev/d' /etc/init.d/machine-id
     fi
 	
     # 启动SSH服务
@@ -96,7 +87,7 @@ if [ "$RSYNC" == "true" ]; then
     if [ ! -e "/conf/rsyncd.conf" ]; then
         cp -f /rsyncd.conf.server /conf/rsyncd.conf
     fi
-    ln -sf /conf/rsyncd.conf /etc/rsyncd.conf
+    #ln -sf /conf/rsyncd.conf /etc/rsyncd.conf
 	
     # 首次运行复制rsync密码文件
     if [ ! -e "/conf/rsync.password" ]; then
