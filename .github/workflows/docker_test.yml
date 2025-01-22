@@ -3,8 +3,8 @@ name: dockertest
 on:
   push:
     paths:
-    - 'Dockerfile'
-    - 'rootfs/**'
+      - "Dockerfile"
+      - "rootfs/**"
   workflow_dispatch:
 
 jobs:
@@ -15,11 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 'Set env'
+      - name: "Set env"
         run: |
           echo "DOCKERTEST_VER=test" >> $GITHUB_ENV
           sudo timedatectl set-timezone "Asia/Shanghai"
-          sed -i "s@RSYNC_VER@$(echo `grep -n "RSYNC_VER=" Dockerfile`|awk -F= '{print $2}')@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner
+          sed -i "s@KMS_VER@$(echo `grep -n "KMS_VER=" Dockerfile`|awk -F= '{print $2}')@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner
           sed -i "s@DATE_TIME@$(date +"%Y/%m/%d %H:%M")@" rootfs/etc/s6-overlay/s6-rc.d/init/00-banner
           cat rootfs/etc/s6-overlay/s6-rc.d/init/00-banner
 
@@ -55,7 +55,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-#          platforms: linux/arm/v7
+          #          platforms: linux/arm/v7
           push: true
           tags: |
             ghcr.io/dothebetter/dockertest:${{ env.DOCKERTEST_VER }}
