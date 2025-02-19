@@ -43,13 +43,13 @@ FROM alpine:latest
 RUN apk add --no-cache \
     libusb \
     openssl \
-    libwrap \
+    tcp_wrappers \
     libgd \
     net-snmp \
     bash \
     lighttpd \
-    lighttpd-mod_auth \
-    lighttpd-mod_cgi
+    lighttpd-mod_auth
+
 
 # 从构建阶段复制已编译的NUT
 COPY --from=builder /usr/local/ /usr/local/
