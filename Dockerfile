@@ -1,60 +1,69 @@
-ARG KMS_VER=20250119
+# 第一阶段：构建环境
+FROM alpine:latest AS builder
 
-FROM alpine:3.21 AS builder
+# 安装必要的依赖
+RUN apk add --no-cache \
+    build-base \
+    autoconf \
+    automake \
+    libtool \
+    libusb-dev \
+    openssl-dev \
+    libwrap-dev \
+    libgd-dev \
+    net-snmp-dev \
+    linux-headers \
+    curl \
+    git \
+    make
 
-WORKDIR /root
+# 下载并解压NUT源码
+RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.0.tar.gz && \
+    tar -xzf v2.8.0.tar.gz && \
+    mv nut-2.8.0 /nut
 
-COPY --chmod=755 backupfiles/ /root/
+# 进入源码目录
+WORKDIR /nut
 
-RUN apk add --no-cache p7zip coreutils make build-base \
-	&& sha256_actual=$(sha256sum /root/vlmcsd-1113-2020-03-28-Hotbird64.7z | awk '{print $1}') \
-	&& sha256_expected=$(cat /root/SHA256.txt) \
-	&& if [ "$sha256_actual" != "$sha256_expected" ]; then \
-	echo "Error: SHA256 checksum mismatch! Actual: $sha256_actual, Expected: $sha256_expected"; \
-	exit 1; \
-	fi \
-	&& mkdir -p /root/vlmcsd \
-	&& 7z x /root/vlmcsd-1113-2020-03-28-Hotbird64.7z -o/root/vlmcsd -p2020 \
-	&& cd /root/vlmcsd \
-	&& make \
-	&& cp /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd \
-	&& chmod +x /usr/bin/vlmcsd \
-	&& vlmcsd -V
+# 生成配置脚本
+RUN ./autogen.sh
 
+# 显示 ./configure --help 的内容
+RUN ./configure --help
 
-FROM alpine:3.21
+# 编译NUT
+RUN ./configure --with-all --with-cgi --with-user=root --with-group=root && \
+    make && \
+    make install
 
-ARG S6_VER=3.2.0.2
+# 第二阶段：运行环境
+FROM alpine:latest
 
-ENV TZ=Asia/Shanghai \
-	VLKMCSD_OPTS="-i /vlmcsd/vlmcsd.ini -D -e" \
-	WEB=true \
-	S6_VERBOSITY=1
+# 安装运行时依赖
+RUN apk add --no-cache \
+    libusb \
+    openssl \
+    libwrap \
+    libgd \
+    net-snmp \
+    bash \
+    lighttpd \
+    lighttpd-mod_auth \
+    lighttpd-mod_cgi
 
-COPY --chmod=755 rootfs /
-COPY --from=builder --chmod=755 /root/vlmcsd/bin/vlmcsd /usr/bin/vlmcsd
+# 从构建阶段复制已编译的NUT
+COPY --from=builder /usr/local/ /usr/local/
 
-RUN set +ex \
-	# 安装应用
-	&& apk add --no-cache ca-certificates tzdata darkhttpd \
-	# 安装s6-overlay	
-	&& if [ "$(uname -m)" = "x86_64" ];then s6_arch=x86_64;elif [ "$(uname -m)" = "aarch64" ];then s6_arch=aarch64;elif [ "$(uname -m)" = "armv7l" ];then s6_arch=arm; fi \
-	&& wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-noarch.tar.xz \
-	&& tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
-	&& wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-${s6_arch}.tar.xz \
-	&& tar -C / -Jxpf /tmp/s6-overlay-${s6_arch}.tar.xz \
-	# 创建kms用户组,创建无密码、无登录权限的用户
-	&& addgroup kms \
-	&& adduser -D -H -G kms -s /sbin/nologin kms \
-	# 创建http用户及组
-	&& addgroup http \
-	&& adduser -D -H -G http -s /sbin/nologin http \
-	# 清除缓存
-	&& rm -rf /var/cache/apk/* \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /tmp/* \
-	&& rm -rf /var/tmp/* \
-	&& rm -rf $HOME/.cache
+# 复制CGI脚本
+COPY --from=builder /nut/scripts/cgi/ /usr/local/share/nut/cgi/
 
-EXPOSE 1688 8080
-ENTRYPOINT [ "/init" ]
+# 配置lighttpd以支持CGI
+RUN echo 'server.modules += ( "mod_cgi" )' >> /etc/lighttpd/lighttpd.conf && \
+    echo 'cgi.assign = ( ".cgi" => "" )' >> /etc/lighttpd/lighttpd.conf && \
+    echo 'server.document-root = "/usr/local/share/nut/cgi"' >> /etc/lighttpd/lighttpd.conf
+
+# 暴露端口
+EXPOSE 80
+
+# 启动lighttpd和NUT
+CMD ["sh", "-c", "lighttpd -D -f /etc/lighttpd/lighttpd.conf & upsdrvctl start && wait"]
