@@ -18,9 +18,9 @@ RUN apk add --no-cache \
     make
 
 # 下载并解压NUT源码
-RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.0.tar.gz && \
-    tar -xzf v2.8.0.tar.gz && \
-    mv nut-2.8.0 /nut
+RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.2.tar.gz && \
+    tar -xzf v2.8.2.tar.gz && \
+    mv nut-2.8.2 /nut
 
 # 进入源码目录
 WORKDIR /nut
@@ -32,7 +32,7 @@ RUN ./autogen.sh
 RUN ./configure --help
 
 # 编译NUT
-RUN ./configure --with-all --with-cgi --with-user=root --with-group=root && \
+RUN ./configure --with-all --with-cgi --with-user=nut --with-group=nut && \
     make && \
     make install
 
