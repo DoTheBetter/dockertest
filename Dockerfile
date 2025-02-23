@@ -4,19 +4,7 @@ FROM alpine:latest
 RUN apk add --no-cache \
     openssl-dev libmodbus-dev libusb-dev net-snmp-dev neon-dev nss-dev \
     libtool autoconf automake make gcc g++ musl-dev curl python3 \
-    avahi-dev flex bison curl-dev jansson-dev git
-
-# 克隆 Powerman 仓库并编译安装
-RUN git clone https://github.com/chaos/powerman.git && \
-    cd powerman && \
-    # 修复头文件包含问题
-    sed -i 's|<sys/poll.h>|<poll.h>|' src/libcommon/xpoll.c && \
-    sed -i '/#include "device_private.h"/i #include <sys/time.h>' src/powerman/device_private.h && \
-    # 禁用将警告视为错误
-    CFLAGS="-Wno-error" ./autogen.sh && \
-    CFLAGS="-Wno-error" ./configure && \
-    make && \
-    make install
+    avahi-dev
 
 # 下载并解压NUT源码
 RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.2.tar.gz && \
@@ -36,7 +24,7 @@ RUN ./autogen.sh
 RUN ./configure --help
 
 # 配置并编译NUT
-RUN ./configure --with-all --with-cgi --with-user=nut --with-group=nut --with-openssl && \
+RUN ./configure --with-all --with-cgi --with-user=nut --with-group=nut --with-openssl --without-powerman && \
     make && \
     make install
 
