@@ -4,7 +4,7 @@ FROM alpine:latest
 RUN apk add --no-cache \
     openssl-dev libmodbus-dev libusb-dev net-snmp-dev neon-dev nss-dev \
     libtool autoconf automake make gcc g++ musl-dev curl python3 \
-    avahi-dev flex bison curl-dev
+    avahi-dev flex bison curl-dev jansson-dev
 
 # 下载并安装 Powerman
 RUN curl -LO https://github.com/chaos/powerman/releases/download/v2.4.4/powerman-2.4.4.tar.gz && \
