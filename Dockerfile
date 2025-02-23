@@ -11,7 +11,7 @@ RUN apk add --no-cache --virtual .build-deps \
     pkgconfig \
     openssl-dev \
     libusb-dev \
-    net-snmp-dev \  # SNMP支持
+    net-snmp-dev \
     pcre-dev \
     linux-headers \
     libcap-dev \
