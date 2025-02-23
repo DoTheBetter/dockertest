@@ -1,7 +1,7 @@
 # 第一阶段：构建环境
 FROM alpine:latest AS builder
 
-# 安装构建依赖
+# 安装基础编译依赖（修正虚拟包写法）
 RUN apk add --no-cache --virtual .build-deps \
     gcc \
     make \
@@ -11,13 +11,22 @@ RUN apk add --no-cache --virtual .build-deps \
     pkgconfig \
     openssl-dev \
     libusb-dev \
-    net-snmp-dev \
-    ipmitool-dev \
+    net-snmp-dev \  # SNMP支持
     pcre-dev \
     linux-headers \
     libcap-dev \
     wget \
-    bash
+    bash \
+    curl \
+    git
+
+# 从源码编译ipmitool（替代ipmitool-dev）
+RUN wget https://downloads.sourceforge.net/project/ipmitool/ipmitool/1.8.18/ipmitool-1.8.18.tar.bz2 \
+    && tar -xjf ipmitool-1.8.18.tar.bz2 \
+    && cd ipmitool-1.8.18 \
+    && ./configure --prefix=/usr --enable-intf-lanplus \
+    && make -j$(nproc) \
+    && make install
 
 # 下载源码
 ENV NUT_VERSION=2.8.2
