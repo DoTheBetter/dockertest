@@ -14,6 +14,9 @@ RUN apk update && apk add --no-cache \
     net-snmp-dev \
     neon-dev \
     wget \
+    # 选择性添加powerman（仅edge版本可用）
+    --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+    powerman-dev \
     && rm -rf /var/cache/apk/* 
 
 # 创建专用用户/组（遵循最小权限原则） 
