@@ -9,8 +9,8 @@ RUN apk add --no-cache \
 # 克隆 Powerman 仓库并编译安装
 RUN git clone https://github.com/chaos/powerman.git && \
     cd powerman && \
-    ./autogen.sh && \
-    ./configure && \
+    CFLAGS="-Wno-error" ./autogen.sh && \
+    CFLAGS="-Wno-error" ./configure && \
     make && \
     make install
 
