@@ -10,6 +10,7 @@ RUN apk add --no-cache \
 RUN curl -LO https://github.com/chaos/powerman/releases/download/v2.4.4/powerman-2.4.4.tar.gz && \
     tar -xzf powerman-2.4.4.tar.gz && \
     cd powerman-2.4.4 && \
+    sed -i '/#include "device_private.h"/i #include <sys/time.h>' src/powerman/device_private.h && \
     CFLAGS="-Wno-error -D_GNU_SOURCE" ./configure && \
     make && \
     make install
