@@ -1,94 +1,69 @@
-# 第一阶段：构建环境
+# 基于Alpine最新版构建，兼顾轻量化与安全性 
 FROM alpine:latest AS builder
 
-# 安装基础编译依赖（修正虚拟包写法）
-RUN apk add --no-cache --virtual .build-deps \
-    gcc \
-    make \
+# 安装编译依赖（包含基础工具链、开发库和CGI支持）
+RUN apk update && apk add --no-cache \
+    build-base \
     autoconf \
     automake \
     libtool \
-    pkgconfig \
     openssl-dev \
     libusb-dev \
-    net-snmp-dev \
-    pcre-dev \
+    gd-dev \
     linux-headers \
-    libcap-dev \
+    net-snmp-dev \
+    neon-dev \
     wget \
-    bash \
-    curl \
-    git
+    && rm -rf /var/cache/apk/* 
 
-# 从源码编译ipmitool（替代ipmitool-dev）
-RUN wget https://downloads.sourceforge.net/project/ipmitool/ipmitool/1.8.18/ipmitool-1.8.18.tar.bz2 \
-    && tar -xjf ipmitool-1.8.18.tar.bz2 \
-    && cd ipmitool-1.8.18 \
-    && ./configure --prefix=/usr --enable-intf-lanplus \
-    && make -j$(nproc) \
-    && make install
+# 创建专用用户/组（遵循最小权限原则） 
+RUN addgroup -S nut && \
+    adduser -D -S -G nut nut
 
-# 下载源码
-ENV NUT_VERSION=2.8.2
+# 下载并解压NUT源码（以v2.8.2为例） 
 WORKDIR /tmp
-RUN wget https://networkupstools.org/source/${NUT_VERSION}/nut-${NUT_VERSION}.tar.gz \
-    && tar -xzf nut-${NUT_VERSION}.tar.gz \
-    && rm nut-${NUT_VERSION}.tar.gz
+RUN wget https://networkupstools.org/source/2.8/nut-2.8.2.tar.gz && \
+    tar xzf nut-2.8.2.tar.gz && \
+    cd nut-2.8.2
 
-# 编译安装
-WORKDIR /tmp/nut-${NUT_VERSION}
+# 配置编译参数（启用全功能并指定用户权限） 
+WORKDIR /tmp/nut-2.8.2
 RUN ./configure \
     --prefix=/usr \
     --sysconfdir=/etc/nut \
     --with-all \
+    --with-cgi \
+    --with-user=nut \
+    --with-group=nut \
     --with-openssl \
     --with-snmp \
-    --with-pcre \
-    --with-usb \
-    --with-ipmi \
-    --with-wrap \
-    --with-cgi \
-    --with-dev \
-    && make -j$(nproc) \
-    && make install DESTDIR=/tmp/install
+    --with-neon \
+    --with-usb=libusb-1.0 \
+    --without-wrap
 
-# 第二阶段：运行时环境
+# 编译与安装（优化多核编译效率）
+RUN make -j$(nproc) && \
+    make install && \
+    make install-initscript
+
+# 生成最终镜像（分离构建阶段以减小体积）
 FROM alpine:latest
+COPY --from=builder /usr/ /usr/
+COPY --from=builder /etc/nut/ /etc/nut/
 
-# 安装运行时依赖
-RUN apk add --no-cache \
+# 安装运行时依赖 
+RUN apk update && apk add --no-cache \
+    libssl3 \
     libusb \
-    pcre \
-    libcap \
+    gd \
     net-snmp-libs \
-    openssl \
-    libgcc \
-    # 可选：CGI支持需要
-    bash \
-    lighttpd
+    neon \
+    && rm -rf /var/cache/apk/*
 
-# 从构建阶段复制必要文件
-COPY --from=builder /tmp/install/usr/sbin/ /usr/sbin/
-COPY --from=builder /tmp/install/usr/lib/ /usr/lib/
-COPY --from=builder /tmp/install/etc/nut/ /etc/nut/
-
-# 创建运行时目录
-RUN mkdir -p /var/run/nut && \
-    # 添加用户/组（保持与默认配置一致）
-    addgroup nut && \
-    adduser -D -G nut nut && \
-    # 设置权限
-    chown -R nut:nut /var/run/nut /etc/nut
-
-# 验证安装
-RUN /usr/sbin/upsc --version && \
-    ldd /usr/sbin/upsdrvctl | grep -q "not found" || echo "All dependencies satisfied"
-
-# 清理文档
-RUN rm -rf /usr/share/doc/nut
-
-# 暴露默认端口
-EXPOSE 3493
-
-# 启动命令（示例）
-CMD ["upsdrvctl", "start"]
+# 验证安装结果（输出关键组件版本） 
+CMD echo "NUT components version:" && \
+    upsd --version && \
+    upsc --version && \
+    nut-scanner --version && \
+    echo "CGI tools check:" && \
+    ls -l /usr/share/nut/cgi-bin/*.cgi
