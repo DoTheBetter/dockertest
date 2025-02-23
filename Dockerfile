@@ -3,7 +3,7 @@ FROM alpine:latest
 # 安装必要的依赖
 RUN apk add --no-cache \
     openssl-dev libmodbus-dev libusb-dev net-snmp-dev neon-dev nss-dev \
-    libtool autoconf automake make gcc musl-dev curl
+    libtool autoconf automake make gcc musl-dev curl python3
 
 # 下载并解压NUT源码
 RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.2.tar.gz && \
@@ -12,6 +12,9 @@ RUN curl -LO https://github.com/networkupstools/nut/archive/refs/tags/v2.8.2.tar
 
 # 进入源码目录
 WORKDIR /nut
+
+# 设置 Python 环境变量
+ENV PYTHON=python3
 
 # 生成配置脚本
 RUN ./autogen.sh
