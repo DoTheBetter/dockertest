@@ -1,7 +1,6 @@
 # 基于Alpine最新版构建，兼顾轻量化与安全性 
 FROM alpine:latest AS builder
 
-# 安装编译依赖（包含基础工具链、开发库和CGI支持）
 RUN apk update && apk add --no-cache \
     build-base \
     autoconf \
@@ -10,6 +9,7 @@ RUN apk update && apk add --no-cache \
     openssl-dev \
     libusb-dev \
     gd-dev \
+    avahi-dev \
     linux-headers \
     net-snmp-dev \
     neon-dev \
@@ -35,11 +35,7 @@ RUN ./configure \
     --with-cgi \
     --with-user=nut \
     --with-group=nut \
-    --with-openssl \
-    --with-snmp \
-    --with-neon \
-    --with-usb=libusb-1.0 \
-    --without-wrap
+    --with-openssl
 
 # 编译与安装（优化多核编译效率）
 RUN make -j$(nproc) && \
