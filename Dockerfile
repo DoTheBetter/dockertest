@@ -9,6 +9,10 @@ RUN apk add --no-cache \
 # 克隆 Powerman 仓库并编译安装
 RUN git clone https://github.com/chaos/powerman.git && \
     cd powerman && \
+    # 修复头文件包含问题
+    sed -i 's|<sys/poll.h>|<poll.h>|' src/libcommon/xpoll.c && \
+    sed -i '/#include "device_private.h"/i #include <sys/time.h>' src/powerman/device_private.h && \
+    # 禁用将警告视为错误
     CFLAGS="-Wno-error" ./autogen.sh && \
     CFLAGS="-Wno-error" ./configure && \
     make && \
