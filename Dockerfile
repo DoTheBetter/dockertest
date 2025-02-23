@@ -10,7 +10,7 @@ RUN apk add --no-cache \
 RUN curl -LO https://github.com/chaos/powerman/releases/download/v2.4.4/powerman-2.4.4.tar.gz && \
     tar -xzf powerman-2.4.4.tar.gz && \
     cd powerman-2.4.4 && \
-    ./configure && \
+    CFLAGS="-Wno-error" ./configure && \
     make && \
     make install
 
