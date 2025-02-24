@@ -17,7 +17,7 @@ RUN apk add --no-cache --virtual .build-deps \
     nss_wrapper-dev \
     gd-dev \
     avahi-dev \
-    libgpiod-dev \
+    libgpiod \
     wget \
     tar
 
