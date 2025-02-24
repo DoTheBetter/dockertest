@@ -50,9 +50,10 @@ RUN ./configure \
 
 # 验证安装结果（输出关键组件版本） 
 RUN echo "NUT components version:" && \
-    upsd -V && \
-    upsc -V && \
-    nut-scanner -V && \
+    ls -l /etc/nut && \
+    upsd -h && \
+    upsc -h && \
+    nut-scanner -h && \
     echo "CGI tools check:" && \
     ls -l /usr/share/nut/cgi-bin/*.cgi
 
@@ -72,10 +73,11 @@ RUN apk add --no-cache \
 # 从构建阶段复制安装内容
 COPY --from=builder /usr/ /usr/
 COPY --from=builder /etc/nut /etc/nut
+COPY --from=builder /usr/share/nut/cgi-bin/*.cgi /usr/share/nut/cgi-bin/*.cgi
 
 # 配置lighttpd
 RUN mkdir -p /var/www/localhost/cgi-bin && \
-    cp /usr/share/nut/cgi/*.cgi /var/www/localhost/cgi-bin/ && \
+    cp /usr/share/nut/cgi-bin/*.cgi /var/www/localhost/cgi-bin/ && \
     chmod +x /var/www/localhost/cgi-bin/*.cgi
 
 COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
