@@ -38,6 +38,7 @@ RUN ./configure \
         --with-group=nut \
         --with-openssl \
         --with-all \
+        --with-cgi \
         --without-gpio \
         --without-powerman \
         --without-ipmi \
