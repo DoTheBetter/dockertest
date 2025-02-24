@@ -18,6 +18,7 @@ RUN apk add --no-cache --virtual .build-deps \
     gd-dev \
     avahi-dev \
     libgpiod \
+    libgpiod-dev \
     wget \
     tar
 
