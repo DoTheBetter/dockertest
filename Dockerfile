@@ -30,6 +30,7 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
     && tar -zxvf /tmp/nut.tar.gz -C /tmp
 
 RUN ls /usr/include/linux/gpio.h && \
+    ls /usr/lib/libgpiod.so* && \
     pkg-config --modversion libgpiod && \
     pkg-config --exists libgpiod && echo "Found" || echo "Not found"
 
@@ -45,6 +46,8 @@ RUN ./configure \
         --with-gpio \
         --with-gpio-includes=/usr/include \
         --with-gpio-libs=/usr/lib \
+        --without-sysfs \
+        --without-linux_gpio \
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
