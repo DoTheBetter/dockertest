@@ -17,8 +17,6 @@ RUN apk add --no-cache --virtual .build-deps \
     nss_wrapper-dev \
     gd-dev \
     avahi-dev \
-    libgpiod \
-    libgpiod-dev \
     wget \
     tar
 
@@ -29,10 +27,6 @@ RUN addgroup -S nut && adduser -S -D -G nut nut
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp
 
-RUN ls /usr/include/linux/gpio.h && \
-    ls /usr/lib/libgpiod.so* && \
-    pkg-config --modversion libgpiod && \
-    pkg-config --exists libgpiod && echo "Found" || echo "Not found"
 
 # 配置和编译安装
 WORKDIR /tmp/nut-2.8.2
@@ -43,11 +37,7 @@ RUN ./configure \
         --with-group=nut \
         --with-openssl \
         --with-all \
-        --with-gpio \
-        --with-gpio-includes=/usr/include \
-        --with-gpio-libs=/usr/lib \
-        --without-sysfs \
-        --without-linux_gpio \
+        --without-gpio \
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
