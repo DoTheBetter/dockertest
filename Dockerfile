@@ -1,12 +1,23 @@
 # 第一阶段：构建环境
 FROM debian:bookworm-slim AS builder
 
-# 安装编译依赖
+# 更新证书包并安装编译依赖
 RUN apt-get update && \
     apt-get install -y \
-    wget build-essential autoconf automake libtool \
-    pkg-config libssl-dev libwrap0-dev libcgicc-dev \
-    libneon27-dev libavahi-client-dev --no-install-recommends && \
+    ca-certificates \
+    wget \
+    build-essential \
+    autoconf \
+    automake \
+    libtool && \
+    apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    libwrap0-dev \
+    libcgicc-dev \
+    libneon27-dev \
+    libavahi-client-dev \
+    --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
 # 下载指定版本源码
