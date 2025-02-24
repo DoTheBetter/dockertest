@@ -7,12 +7,15 @@ RUN apk add --no-cache --virtual .build-deps \
     autoconf \
     automake \
     libtool \
-    openssl-dev \
     linux-headers \
+    openssl-dev \
+    libmodbus-dev \
     libusb-dev \
-    gd-dev \
     net-snmp-dev \
-    libwrap-dev \
+    neon-dev \
+    nss-dev \
+    nss_wrapper-dev \
+    gd-dev \
     wget \
     tar
 
