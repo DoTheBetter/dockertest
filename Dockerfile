@@ -1,5 +1,5 @@
 # 构建阶段：安装编译环境和构建NUT
-FROM alpine:3.21 AS builder
+FROM alpine:3.21
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
@@ -31,9 +31,18 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
 
 # 配置和编译安装
 WORKDIR /tmp/nut-2.8.2
-RUN ./configure \
-        --prefix=/usr \
-        --sysconfdir=/etc/nut \
+RUN CFLAGS="$CFLAGS -flto=auto" \
+    && ./configure \
+        --enable-static \
+        --disable-shared \
+		--prefix=/usr \
+		--libexecdir=/usr/lib/nut \
+		--with-drvpath=/usr/lib/nut \
+		--datadir=/usr/share/nut \
+		--sysconfdir=/etc/nut \
+		--with-statepath=/var/run/nut \
+		--with-altpidpath=/var/run/nut \
+		--with-udev-dir=/usr/lib/udev \
         --with-user=nut \
         --with-group=nut \
         --with-openssl \
@@ -57,23 +66,11 @@ RUN echo "NUT components version:" && \
     echo "CGI tools check:" && \
     ls -l /usr/share/nut/cgi-bin/*.cgi
 
-# 运行时阶段：使用lighttpd作为Web服务器
-FROM alpine:3.21
+
 
 # 安装运行时依赖和lighttpd
 RUN apk add --no-cache \
-    openssl \
-    libusb \
-    gd \
-    net-snmp \
-    nss_wrapper \
     lighttpd
-
-
-# 从构建阶段复制安装内容
-COPY --from=builder /usr/ /usr/
-COPY --from=builder /etc/nut /etc/nut
-COPY --from=builder /usr/share/nut/cgi-bin/*.cgi /usr/share/nut/cgi-bin/*.cgi
 
 # 配置lighttpd
 RUN mkdir -p /var/www/localhost/cgi-bin && \
@@ -81,10 +78,6 @@ RUN mkdir -p /var/www/localhost/cgi-bin && \
     chmod +x /var/www/localhost/cgi-bin/*.cgi
 
 COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
-
-# 重建运行时用户/组
-RUN addgroup -S -g $(id -g nut) nut && \
-    adduser -S -D -G nut -u $(id -u nut) nut
 
 # 设置权限
 RUN chown -R nut:nut /etc/nut /var/www/localhost && \
