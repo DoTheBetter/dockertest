@@ -29,6 +29,10 @@ RUN addgroup -S nut && adduser -S -D -G nut nut
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp
 
+RUN ls /usr/include/linux/gpio.h && \
+    pkg-config --modversion libgpiod && \
+    pkg-config --exists libgpiod && echo "Found" || echo "Not found"
+
 # 配置和编译安装
 WORKDIR /tmp/nut-2.8.2
 RUN ./configure \
