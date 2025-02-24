@@ -17,6 +17,7 @@ RUN apk add --no-cache --virtual .build-deps \
     nss_wrapper-dev \
     gd-dev \
     avahi-dev \
+    i2c-tools-dev \
     wget \
     tar
 
