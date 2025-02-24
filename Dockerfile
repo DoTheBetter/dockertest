@@ -1,86 +1,86 @@
-# 第一阶段：构建环境
-FROM debian:bookworm-slim AS builder
+# 构建阶段：安装编译环境和构建NUT
+FROM alpine:latest AS builder
 
-# 更新证书包并安装编译依赖
-RUN apt-get update && \
-    apt-get install -y \
-    ca-certificates \
-    wget \
-    build-essential \
+# 安装编译依赖
+RUN apk add --no-cache --virtual .build-deps \
+    build-base \
     autoconf \
     automake \
-    libtool && \
-    apt-get install -y \
-    pkg-config \
-    libssl-dev \
-    libwrap0-dev \
-    libcgicc-dev \
-    libneon27-dev \
-    libavahi-client-dev \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    libtool \
+    openssl-dev \
+    linux-headers \
+    libusb-dev \
+    gd-dev \
+    net-snmp-dev \
+    libwrap-dev \
+    wget \
+    tar
 
-# 下载指定版本源码
-WORKDIR /tmp
-RUN wget https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz && \
-    tar xzf nut-2.8.2.tar.gz && \
-    mv nut-2.8.2 nut
+# 创建nut用户/组
+RUN addgroup -S nut && adduser -S -D -G nut nut
 
-# 配置编译参数
-WORKDIR /tmp/nut
+# 下载并解压指定版本源码
+RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
+    && tar -zxvf /tmp/nut.tar.gz -C /tmp
+
+# 配置和编译安装
+WORKDIR /tmp/nut-2.8.2
 RUN ./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc/nut \
-    --with-all \
-    --with-cgi \
-    --with-user=nut \
-    --with-group=nut \
-    --with-openssl \
-    --with-dev \
-    --without-doc
+        --prefix=/usr \
+        --sysconfdir=/etc/nut \
+        --with-user=nut \
+        --with-group=nut \
+        --with-openssl \
+        --with-all \
+        --without-powerman \
+        --without-ipmi \
+        --without-freeipmi \
+    && make -j$(nproc) \
+    && make install
 
-# 编译安装
-RUN make -j$(nproc) && \
-    make install && \
-    strip /usr/lib/nut/*.so && \
-    strip /usr/bin/nutcgi
 
-# 第二阶段：运行时环境
-FROM debian:bookworm-slim
+# 验证安装结果（输出关键组件版本） 
+RUN echo "NUT components version:" && \
+    upsd --version && \
+    upsc --version && \
+    nut-scanner --version && \
+    echo "CGI tools check:" && \
+    ls -l /usr/share/nut/cgi-bin/*.cgi
 
-# 安装运行时依赖和微型HTTP服务
-RUN apt-get update && \
-    apt-get install -y \
-    libssl3 libwrap0 libcgicc3 libneon27 libavahi-client3 \
-    busybox --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/* /usr/share/man/*
+# 运行时阶段：使用lighttpd作为Web服务器
+FROM alpine:latest
 
-# 复制构建产物
+# 安装运行时依赖和lighttpd
+RUN apk add --no-cache \
+    openssl \
+    libusb \
+    gd \
+    net-snmp \
+    libwrap \
+    lighttpd \
+    lighttpd-mod_cgi
+
+# 从构建阶段复制安装内容
 COPY --from=builder /usr/ /usr/
-COPY --from=builder /etc/nut/ /etc/nut/
+COPY --from=builder /etc/nut /etc/nut
 
-# 创建nut用户和运行目录
-RUN groupadd -r nut && \
-    useradd -r -g nut -d /var/lib/nut nut && \
-    mkdir -p /var/run/nut /var/www/nut && \
-    chown -R nut:nut /var/run/nut /etc/nut
+# 配置lighttpd
+RUN mkdir -p /var/www/localhost/cgi-bin && \
+    cp /usr/share/nut/cgi/*.cgi /var/www/localhost/cgi-bin/ && \
+    chmod +x /var/www/localhost/cgi-bin/*.cgi
 
-# 配置HTTP服务
-COPY --from=builder /usr/share/nut/www/* /var/www/nut/
-RUN chmod +x /var/www/nut/*.cgi && \
-    echo "httpd -p 8080 -h /var/www/nut" > /start-httpd.sh && \
-    chmod +x /start-httpd.sh
+COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
 
-# 复合启动脚本
-RUN echo "#!/bin/sh\n\
-/start-httpd.sh &\n\
-upsd -D\n\
-wait" > /entrypoint.sh && \
-    chmod +x /entrypoint.sh
+# 重建运行时用户/组
+RUN addgroup -S -g $(id -g nut) nut && \
+    adduser -S -D -G nut -u $(id -u nut) nut
 
-# 暴露端口
-EXPOSE 3493 8080
+# 设置权限
+RUN chown -R nut:nut /etc/nut /var/www/localhost && \
+    chmod 755 /var/www/localhost/cgi-bin/*.cgi
 
-# 启动服务
-USER nut
-ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 80
+
+CMD sh -c "upsdrvctl start && \
+           upsd && \
+           lighttpd -D -f /etc/lighttpd/lighttpd.conf"
