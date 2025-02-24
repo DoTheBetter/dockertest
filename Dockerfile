@@ -39,6 +39,7 @@ RUN ./configure \
         --with-openssl \
         --with-all \
         --with-cgi \
+        --with-cgipath=/usr/share/nut/cgi-bin \
         --without-gpio \
         --without-powerman \
         --without-ipmi \
@@ -49,9 +50,9 @@ RUN ./configure \
 
 # 验证安装结果（输出关键组件版本） 
 RUN echo "NUT components version:" && \
-    upsd --version && \
-    upsc --version && \
-    nut-scanner --version && \
+    upsd -V && \
+    upsc -V && \
+    nut-scanner -V && \
     echo "CGI tools check:" && \
     ls -l /usr/share/nut/cgi-bin/*.cgi
 
