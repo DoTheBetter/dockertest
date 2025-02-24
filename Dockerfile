@@ -42,6 +42,9 @@ RUN ./configure \
         --with-group=nut \
         --with-openssl \
         --with-all \
+        --with-gpio \
+        --with-gpio-includes=/usr/include \
+        --with-gpio-libs=/usr/lib \
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
