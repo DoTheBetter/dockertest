@@ -1,5 +1,5 @@
 # 构建阶段：安装编译环境和构建NUT
-FROM alpine:latest AS builder
+FROM alpine:3.21 AS builder
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
@@ -51,7 +51,7 @@ RUN echo "NUT components version:" && \
     ls -l /usr/share/nut/cgi-bin/*.cgi
 
 # 运行时阶段：使用lighttpd作为Web服务器
-FROM alpine:latest
+FROM alpine:3.21
 
 # 安装运行时依赖和lighttpd
 RUN apk add --no-cache \
@@ -59,9 +59,9 @@ RUN apk add --no-cache \
     libusb \
     gd \
     net-snmp \
-    libwrap \
-    lighttpd \
-    lighttpd-mod_cgi
+    nss_wrapper \
+    lighttpd
+
 
 # 从构建阶段复制安装内容
 COPY --from=builder /usr/ /usr/
