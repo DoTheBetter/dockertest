@@ -19,45 +19,47 @@ RUN apk add --no-cache --virtual .build-deps \
     avahi-dev \
     i2c-tools-dev \
     wget \
-    tar
+    tar \
+    tree
 
 # 创建nut用户/组
-RUN addgroup -S nut && adduser -S -D -G nut nut
+RUN addgroup -S nut \
+    && adduser -S -D -G nut nut
 
 # 下载并解压指定版本源码
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp
 
-
 # 配置和编译安装
 WORKDIR /tmp/nut-2.8.2
 RUN CFLAGS="$CFLAGS -flto=auto" \
     && ./configure \
-		--build=$CBUILD \
-		--host=$CHOST \
-		--disable-static \
-		--prefix=/usr \
-		--libexecdir=/usr/lib/nut \
-		--with-drvpath=/usr/lib/nut \
-		--datadir=/usr/share/nut \
-		--sysconfdir=/etc/nut \
-		--with-statepath=/var/run/nut \
-		--with-altpidpath=/var/run/nut \
-		--with-udev-dir=/usr/lib/udev \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --disable-static \
+        --prefix=/usr \
+        --libexecdir=/usr/lib/nut \
+        --with-drvpath=/usr/lib/nut \
+        --datadir=/usr/share/nut \
+        --sysconfdir=/etc/nut \
+        --with-statepath=/var/run/nut \
+        --with-altpidpath=/var/run/nut \
+        --with-udev-dir=/usr/lib/udev \
         --with-user=nut \
         --with-group=nut \
-		--with-nss \
-		--with-openssl \
+        --with-nss \
+        --with-openssl \
         --with-all \
         --with-cgi \
         --with-cgipath=/usr/share/nut/cgi-bin \
-		--with-serial \
-		--with-usb \
-		--with-snmp \
-		--with-neon \
-		--with-modbus \
-		--with-avahi \
-		--with-libltdl \
+        --with-htmlpath=/usr/share/nut/html \
+        --with-serial \
+        --with-usb \
+        --with-snmp \
+        --with-neon \
+        --with-modbus \
+        --with-avahi \
+        --with-libltdl \
         --without-gpio \
         --without-powerman \
         --without-ipmi \
@@ -65,35 +67,35 @@ RUN CFLAGS="$CFLAGS -flto=auto" \
     && make -j$(nproc) \
     && make install
 
-
-# 验证安装结果（输出关键组件版本） 
-RUN echo "NUT components version:" && \
-    ls -l /etc/nut && \
-    upsd -h && \
-    upsc -h && \
-    nut-scanner -h && \
-    echo "CGI tools check:" && \
-    ls -l /usr/share/nut/cgi-bin/*.cgi
-
-
+# 验证安装结果（输出关键组件版本）
+RUN echo "NUT components version:" \
+    && upsd -h \
+    && upsc -h \
+    && nut-scanner -h \
+    && echo "/usr/share/nut目录结构：" \
+    && tree -phugD --du /usr/share/nut \
+    && echo "/usr/lib/nut目录结构：" \
+    && tree -phugD --du /usr/lib/nut \
+    && echo "/etc/nut目录结构：" \
+    && tree -phugD --du /etc/nut
 
 # 安装运行时依赖和lighttpd
 RUN apk add --no-cache \
     lighttpd
 
 # 配置lighttpd
-RUN mkdir -p /var/www/localhost/cgi-bin && \
-    cp /usr/share/nut/cgi-bin/*.cgi /var/www/localhost/cgi-bin/ && \
-    chmod +x /var/www/localhost/cgi-bin/*.cgi
+RUN mkdir -p /var/www/localhost/cgi-bin \
+    && cp /usr/share/nut/cgi-bin/*.cgi /var/www/localhost/cgi-bin/ \
+    && chmod +x /var/www/localhost/cgi-bin/*.cgi
 
 COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
 
 # 设置权限
-RUN chown -R nut:nut /etc/nut /var/www/localhost && \
-    chmod 755 /var/www/localhost/cgi-bin/*.cgi
+RUN chown -R nut:nut /etc/nut /var/www/localhost \
+    && chmod 755 /var/www/localhost/cgi-bin/*.cgi
 
 EXPOSE 80
 
-CMD sh -c "upsdrvctl start && \
-           upsd && \
-           lighttpd -D -f /etc/lighttpd/lighttpd.conf"
+CMD sh -c "upsdrvctl start \
+    && upsd \
+    && lighttpd -D -f /etc/lighttpd/lighttpd.conf"
