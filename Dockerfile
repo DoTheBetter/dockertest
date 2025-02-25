@@ -62,9 +62,10 @@ RUN echo "NUT components version:" \
     && tree /etc/nut
 
 # 编译步骤...
+ENV LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 RUN apk del .build-deps \
     && apk add --no-cache hidapi eudev libltdl openssl libmodbus libusb net-snmp-libs neon nss gd avahi-libs i2c-tools \
-    && ldconfig /usr/lib \
+    #&& ldconfig /usr/lib \
     && echo "++++++NUT components version:++++++" \
     && upsd -V \
     && upsc -V \
