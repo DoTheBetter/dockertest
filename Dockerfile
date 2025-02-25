@@ -3,10 +3,7 @@ FROM alpine:3.21
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
-    build-base \
-    autoconf \
-    automake \
-    libtool \
+    hidapi eudev udev-init-scripts-openrc build-base autoconf automake libtool \
     linux-headers \
     openssl-dev \
     libmodbus-dev \
@@ -22,9 +19,6 @@ RUN apk add --no-cache --virtual .build-deps \
     tar \
     tree
 
-# 创建nut用户/组
-RUN addgroup -S nut \
-    && adduser -S -D -G nut nut
 
 # 下载并解压指定版本源码
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
@@ -82,6 +76,10 @@ RUN echo "NUT components version:" \
 # 安装运行时依赖和lighttpd
 RUN apk add --no-cache \
     lighttpd
+
+# 创建nut用户/组
+RUN addgroup -S nut \
+    && adduser -S -D -G nut nut
 
 # 配置lighttpd
 RUN mkdir -p /var/www/localhost/cgi-bin \
