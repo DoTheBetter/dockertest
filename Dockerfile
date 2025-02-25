@@ -3,8 +3,14 @@ FROM alpine:3.21
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
-    hidapi eudev udev-init-scripts-openrc build-base autoconf automake libtool \
+    hidapi eudev udev-init-scripts-openrc build-base autoconf automake \
     linux-headers \
+    wget \
+    tar \
+    tree
+
+RUN apk add --no-cache \
+    libtool \
     openssl-dev \
     libmodbus-dev \
     libusb-dev \
@@ -14,21 +20,7 @@ RUN apk add --no-cache --virtual .build-deps \
     nss_wrapper-dev \
     gd-dev \
     avahi-dev \
-    i2c-tools-dev \
-    wget \
-    tar \
-    tree
-
-RUN apk add --no-cache \
-    libmodbus \
-    libusb \
-    net-snmp \
-    neon \
-    nss \
-    nss_wrapper \
-    gd \
-    avahi \
-    i2c-tools
+    i2c-tools-dev
 
 # 下载并解压指定版本源码
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
