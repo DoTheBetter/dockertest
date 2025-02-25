@@ -65,7 +65,7 @@ RUN echo "NUT components version:" \
 
 # 编译步骤...
 RUN apk del .build-deps \
-    && "++++++NUT components version:++++++" \
+    && echo "++++++NUT components version:++++++" \
     && upsd -V \
     && upsc -V \
     && nut-scanner -V \
