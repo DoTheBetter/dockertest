@@ -63,9 +63,8 @@ RUN echo "NUT components version:" \
 
 # 编译步骤...
 RUN apk del .build-deps \
-    && apk add --no-cache \
-        hidapi eudev libltdl openssl libmodbus libusb net-snmp-libs neon nss gd avahi-libs i2c-tools \
+    && apk add --no-cache hidapi eudev libltdl openssl libmodbus libusb net-snmp-libs neon nss gd avahi-libs i2c-tools \
     && echo "++++++NUT components version:++++++" \
     && upsd -V \
     && upsc -V \
-    && nut-scanner -V \
+    && nut-scanner -V
