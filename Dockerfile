@@ -33,8 +33,9 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
 WORKDIR /tmp/nut-2.8.2
 RUN CFLAGS="$CFLAGS -flto=auto" \
     && ./configure \
-        --enable-static \
-        --disable-shared \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--disable-static \
 		--prefix=/usr \
 		--libexecdir=/usr/lib/nut \
 		--with-drvpath=/usr/lib/nut \
@@ -45,10 +46,18 @@ RUN CFLAGS="$CFLAGS -flto=auto" \
 		--with-udev-dir=/usr/lib/udev \
         --with-user=nut \
         --with-group=nut \
-        --with-openssl \
+		--with-nss \
+		--with-openssl \
         --with-all \
         --with-cgi \
         --with-cgipath=/usr/share/nut/cgi-bin \
+		--with-serial \
+		--with-usb \
+		--with-snmp \
+		--with-neon \
+		--with-modbus \
+		--with-avahi \
+		--with-libltdl \
         --without-gpio \
         --without-powerman \
         --without-ipmi \
