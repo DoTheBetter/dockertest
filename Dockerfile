@@ -6,9 +6,7 @@ RUN apk add --no-cache --virtual .build-deps \
         build-base autoconf automake libtool \
         hidapi-dev eudev-dev linux-headers openssl-dev libmodbus-dev libusb-dev net-snmp-dev \
         neon-dev nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev \
-        wget tar tree \
-    && apk add --no-cache \
-        hidapi eudev libltdl openssl libmodbus libusb net-snmp neon nss gd avahi i2c-tools
+        wget tar tree
 
 # 下载并解压指定版本源码
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
@@ -57,14 +55,16 @@ RUN echo "NUT components version:" \
     && upsc -h \
     && nut-scanner -h \
     && echo "/usr/share/nut目录结构：" \
-    && tree -phugD --du /usr/share/nut \
+    && tree /usr/share/nut \
     && echo "/usr/lib/nut目录结构：" \
-    && tree -phugD --du /usr/lib/nut \
+    && tree /usr/lib/nut \
     && echo "/etc/nut目录结构：" \
-    && tree -phugD --du /etc/nut
+    && tree /etc/nut
 
 # 编译步骤...
 RUN apk del .build-deps \
+    && apk add --no-cache \
+        hidapi eudev libltdl openssl libmodbus libusb net-snmp-libs neon nss gd avahi-libs i2c-tools \
     && echo "++++++NUT components version:++++++" \
     && upsd -V \
     && upsc -V \
