@@ -73,27 +73,12 @@ RUN echo "NUT components version:" \
     && echo "/etc/nut目录结构：" \
     && tree -phugD --du /etc/nut
 
-# 安装运行时依赖和lighttpd
-RUN apk add --no-cache \
-    lighttpd
+# 清理构建依赖和临时文件
+RUN apk del .build-deps && \
+    rm -rf /tmp/* /var/cache/apk/*
 
-# 创建nut用户/组
-RUN addgroup -S nut \
-    && adduser -S -D -G nut nut
-
-# 配置lighttpd
-RUN mkdir -p /var/www/localhost/cgi-bin \
-    && cp /usr/share/nut/cgi-bin/*.cgi /var/www/localhost/cgi-bin/ \
-    && chmod +x /var/www/localhost/cgi-bin/*.cgi
-
-COPY lighttpd.conf /etc/lighttpd/lighttpd.conf
-
-# 设置权限
-RUN chown -R nut:nut /etc/nut /var/www/localhost \
-    && chmod 755 /var/www/localhost/cgi-bin/*.cgi
-
-EXPOSE 80
-
-CMD sh -c "upsdrvctl start \
-    && upsd \
-    && lighttpd -D -f /etc/lighttpd/lighttpd.conf"
+# 验证安装结果（输出关键组件版本）
+RUN echo "++++++++++++++NUT components version:++++++++++++++" \
+    && upsd -v \
+    && upsc -v \
+    && nut-scanner -v
