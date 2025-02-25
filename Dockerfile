@@ -3,14 +3,8 @@ FROM alpine:3.21
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
-    hidapi eudev udev-init-scripts-openrc build-base autoconf automake \
+    hidapi eudev udev-init-scripts-openrc build-base autoconf automake libtool \
     linux-headers \
-    wget \
-    tar \
-    tree
-
-RUN apk add --no-cache \
-    libtool \
     openssl-dev \
     libmodbus-dev \
     libusb-dev \
@@ -20,7 +14,11 @@ RUN apk add --no-cache \
     nss_wrapper-dev \
     gd-dev \
     avahi-dev \
-    i2c-tools-dev
+    i2c-tools-dev \
+    wget \
+    tar \
+    tree
+
 
 # 下载并解压指定版本源码
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
@@ -74,13 +72,3 @@ RUN echo "NUT components version:" \
     && tree -phugD --du /usr/lib/nut \
     && echo "/etc/nut目录结构：" \
     && tree -phugD --du /etc/nut
-
-# 清理构建依赖和临时文件
-RUN apk del .build-deps && \
-    rm -rf /tmp/* /var/cache/apk/*
-
-# 验证安装结果（输出关键组件版本）
-RUN echo "++++++++++++++NUT components version:++++++++++++++" \
-    && upsd -v \
-    && upsc -v \
-    && nut-scanner -v
