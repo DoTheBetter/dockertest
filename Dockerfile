@@ -3,7 +3,7 @@ FROM alpine:3.21
 
 # 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
-    hidapi build-base autoconf automake libtool \
+    hidapi eudev udev-init-scripts-openrc build-base autoconf automake libtool \
     linux-headers \
     openssl-dev \
     libmodbus-dev \
@@ -20,9 +20,6 @@ RUN apk add --no-cache --virtual .build-deps \
     tree
 
 RUN apk add --no-cache \
-    hidapi-libs \
-    eudev \
-    udev-init-scripts-openrc \
     libmodbus \
     libusb \
     net-snmp \
