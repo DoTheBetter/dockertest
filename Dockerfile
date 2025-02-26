@@ -41,9 +41,11 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
     && make -j$(nproc) \
     && make install
 
+# 设置 PATH
+ENV PATH=/usr/local/ups/bin:$PATH
+
 # 验证安装结果（输出关键组件版本）
 RUN echo "NUT components version:" \
-    && export PATH=/usr/local/ups/bin:$PATH \
     && upsd -h \
     && upsc -h \
     && nut-scanner -h \
