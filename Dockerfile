@@ -39,8 +39,7 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --without-ipmi \
         --without-freeipmi \
     && make -j$(nproc) \
-    && make install \
-    && strip --strip-all /usr/local/ups/bin/*
+    && make install
 
 # 验证安装结果（输出关键组件版本）
 RUN echo "NUT components version:" \
