@@ -54,10 +54,10 @@ RUN echo "/usr/local/ups目录结构：" \
 
 #验证是否为静态
 RUN for f in /usr/local/ups/sbin/*; do \
-        && echo "Checking $f:" \
-        && file "$f" \
-        && ldd "$f" \
-        && echo "-----------------------------"; \
+        echo "Checking $f:"; \
+        file "$f"; \
+        ldd "$f"; \
+        echo "-----------------------------"; \
     done \
     && echo "Checking /usr/local/ups/bin/upsc:" \
     && file /usr/local/ups/bin/upsc \
