@@ -19,7 +19,8 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --build=$CBUILD \
         --host=$CHOST \
         --enable-static \
-        --enable-shared \
+        --disable-shared \
+        --enable-strip \
         --prefix=/usr/local/ups \
         --with-user=root \
         --with-group=root \
@@ -68,5 +69,5 @@ RUN for f in /usr/local/ups/sbin/*; do \
     && ldd /usr/local/ups/bin/nut-scanner
 
 # 验证阶段（添加库存在性检查）
-RUN echo "关键共享库验证：" \
-    && ls -l /usr/lib/libupsclient.so*
+#RUN echo "关键共享库验证：" \
+#    && ls -l /usr/lib/libupsclient.so*
