@@ -1,18 +1,23 @@
 # 构建阶段：安装编译环境和构建NUT
 FROM alpine:3.21
 
-# 合并所有安装步骤到单个RUN指令（减少镜像层）
+# 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
         build-base linux-headers autoconf automake \
-        wget tar libtool hidapi eudev openssl-dev \
-        libmodbus-dev libusb-dev net-snmp-dev neon-dev \
-        nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev \
-    # 下载并解压源码（带自动清理）
-    && wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
-    && tar -zxvf /tmp/nut.tar.gz -C /tmp --strip-components=1 \
-    && cd /tmp/nut-2.8.2 \
-    # 配置和编译安装
-    && CFLAGS="$CFLAGS -flto=auto" ./configure \
+        wget tar tree
+
+RUN apk add --no-cache \
+        libtool hidapi eudev openssl-dev libmodbus-dev libusb-dev net-snmp-dev \
+        neon-dev nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev
+
+# 下载并解压指定版本源码
+RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
+    && tar -zxvf /tmp/nut.tar.gz -C /tmp
+
+# 配置和编译安装
+WORKDIR /tmp/nut-2.8.2
+RUN CFLAGS="$CFLAGS -flto=auto" \
+    && ./configure \
         --build=$CBUILD \
         --host=$CHOST \
         --disable-static \
@@ -44,24 +49,23 @@ RUN apk add --no-cache --virtual .build-deps \
         --without-ipmi \
         --without-freeipmi \
     && make -j$(nproc) \
-    && make install \
-    # 清理步骤
-    && make clean \
-    && apk del .build-deps \
-    && rm -rf \
-        /tmp/* \
-        /var/cache/apk/* \
-        /usr/share/man/* \
-        /usr/include/* \
-        /var/lib/apk/lists/*
+    && make install
 
-# 精简版验证（移除tree依赖）
+# 验证安装结果（输出关键组件版本）
 RUN echo "NUT components version:" \
-    && upsd -V \
-    && upsc -V \
-    && nut-scanner -V
+    && upsd -h \
+    && upsc -h \
+    && nut-scanner -h \
+    && echo "/usr/share/nut目录结构：" \
+    && tree /usr/share/nut \
+    && echo "/usr/lib/nut目录结构：" \
+    && tree /usr/lib/nut \
+    && echo "/etc/nut目录结构：" \
+    && tree /etc/nut
 
-# 应用权限配置
-USER nut:nut
-EXPOSE 3493
-CMD ["upsd", "-D"]
+
+RUN apk del .build-deps \
+    && echo "++++++NUT components version:++++++" \
+    && upsd -h \
+    && upsc -h \
+    && nut-scanner -h
