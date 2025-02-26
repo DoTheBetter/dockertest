@@ -43,14 +43,14 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
 
 # 验证安装结果（输出关键组件版本）
 RUN echo "/usr/local/ups目录结构：" \
-    && tree /usr/local/ups
+    && tree /usr/local/ups \
     && echo "NUT components version:" \
     && /usr/local/ups/upsd -h \
     && /usr/local/ups/upsc -h \
     && /usr/local/ups/nut-scanner -h \
     && /usr/local/ups/upsd -V \
     && /usr/local/ups/upsc -V \
-    && /usr/local/ups/nut-scanner -V \
+    && /usr/local/ups/nut-scanner -V
 
 
 # 验证阶段（添加库存在性检查）
