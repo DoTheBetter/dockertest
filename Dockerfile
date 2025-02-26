@@ -16,7 +16,7 @@ RUN apk add --no-cache --virtual .build-deps \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp \
     && cd /tmp/nut-2.8.2 \
     # 配置和编译安装
-    && CFLAGS="$CFLAGS -flto=auto" ./configure \
+    && CFLAGS="$CFLAGS -flto=auto -Wl,-rpath=/usr/lib" ./configure \
         --build=$CBUILD \
         --host=$CHOST \
         --disable-static \
@@ -58,6 +58,12 @@ RUN apk add --no-cache --virtual .build-deps \
         /usr/share/man/* \
         /usr/include/* \
         /var/lib/apk/lists/*
+# 验证阶段（添加库存在性检查）
+RUN echo "关键共享库验证：" \
+    && ls -l /usr/lib/libusb-1.0.so* \
+    && ls -l /usr/lib/libnetsnmp.so* \
+    && ls -l /usr/lib/libneon.so* \
+    && ls -l /usr/lib/libavahi-client.so*
 
 # 精简版验证（移除tree依赖）
 RUN echo "NUT components version:" \
