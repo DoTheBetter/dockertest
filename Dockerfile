@@ -7,6 +7,10 @@ RUN apk add --no-cache --virtual .build-deps \
         wget tar libtool hidapi eudev openssl-dev \
         libmodbus-dev libusb-dev net-snmp-dev neon-dev \
         nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev \
+   # 显式安装运行时库（避免后续删除）
+    && apk add --no-cache \
+        openssl nss nss_wrapper neon libmodbus libusb \
+        net-snmp-libs gd avahi-libs \
     # 下载并解压源码（带自动清理）
     && wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp \
