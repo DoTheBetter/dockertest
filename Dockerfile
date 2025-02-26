@@ -9,7 +9,7 @@ RUN apk add --no-cache --virtual .build-deps \
         nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev \
     # 下载并解压源码（带自动清理）
     && wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
-    && tar -zxvf /tmp/nut.tar.gz -C /tmp --strip-components=1 \
+    && tar -zxvf /tmp/nut.tar.gz -C /tmp \
     && cd /tmp/nut-2.8.2 \
     # 配置和编译安装
     && CFLAGS="$CFLAGS -flto=auto" ./configure \
