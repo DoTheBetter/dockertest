@@ -51,7 +51,7 @@ RUN echo "NUT components version:" \
     && nut-scanner -h \
     && upsd -V \
     && upsc -V \
-    && nut-scanner -V
+    && nut-scanner -V \
     && echo "/usr/local/ups目录结构：" \
     && tree /usr/local/ups
 
