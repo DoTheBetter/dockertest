@@ -19,7 +19,7 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --build=$CBUILD \
         --host=$CHOST \
         --enable-static \
-        --disable-shared \
+        --enable-shared \
         --prefix=/usr/local/ups \
         --with-user=root \
         --with-group=root \
@@ -38,6 +38,7 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
+        LDFLAGS="-static" \
     && make -j$(nproc) \
     && make install
 
@@ -52,10 +53,21 @@ RUN echo "/usr/local/ups目录结构：" \
     && /usr/local/ups/bin/upsc -V \
     && /usr/local/ups/bin/nut-scanner -V
 
+#验证是否为静态
+RUN for f in /usr/local/ups/sbin/*; do \
+        && echo "Checking $f:" \
+        && file "$f" \
+        && ldd "$f" \
+        && echo "-----------------------------"; \
+    done \
+    && echo "Checking /usr/local/ups/bin/upsc:" \
+    && file /usr/local/ups/bin/upsc \
+    && ldd /usr/local/ups/bin/upsc \
+    && echo "-----------------------------" \
+    && echo "Checking /usr/local/ups/bin/nut-scanner:" \
+    && file /usr/local/ups/bin/nut-scanner \
+    && ldd /usr/local/ups/bin/nut-scanner
 
 # 验证阶段（添加库存在性检查）
 RUN echo "关键共享库验证：" \
-    && ls -l /usr/lib/libusb-1.0.so* \
-    && ls -l /usr/lib/libnetsnmp.so* \
-    && ls -l /usr/lib/libneon.so* \
-    && ls -l /usr/lib/libavahi-client.so*
+    && ls -l /usr/lib/libupsclient.so*
