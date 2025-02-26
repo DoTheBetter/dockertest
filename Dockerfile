@@ -18,10 +18,9 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
     && ./configure \
         --build=$CBUILD \
         --host=$CHOST \
-        --enable-static \
-        --disable-shared \
+        --disable-static \
         --enable-strip \
-        --prefix=/usr/local/ups \
+        --prefix=/nut \
         --with-user=root \
         --with-group=root \
         --with-nss \
@@ -43,30 +42,30 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
     && make install
 
 # 验证安装结果（输出关键组件版本）
-RUN echo "/usr/local/ups目录结构：" \
-    && tree /usr/local/ups \
+RUN echo "/nut目录结构：" \
+    && tree /nut \
     && echo "NUT components version:" \
-    && /usr/local/ups/sbin/upsd -h \
-    && /usr/local/ups/bin/upsc -h \
-    && /usr/local/ups/bin/nut-scanner -h \
-    && /usr/local/ups/sbin/upsd -V \
-    && /usr/local/ups/bin/upsc -V \
-    && /usr/local/ups/bin/nut-scanner -V
+    && /nut/sbin/upsd -h \
+    && /nut/bin/upsc -h \
+    && /nut/bin/nut-scanner -h \
+    && /nut/sbin/upsd -V \
+    && /nut/bin/upsc -V \
+    && /nut/bin/nut-scanner -V
 
 #验证是否为静态
-RUN for f in /usr/local/ups/sbin/*; do \
+RUN for f in /nut/sbin/*; do \
         echo "Checking $f:"; \
         file "$f"; \
         ldd "$f"; \
         echo "-----------------------------"; \
     done \
-    && echo "Checking /usr/local/ups/bin/upsc:" \
-    && file /usr/local/ups/bin/upsc \
-    && ldd /usr/local/ups/bin/upsc \
+    && echo "Checking /nut/bin/upsc:" \
+    && file /nut/bin/upsc \
+    && ldd /nut/bin/upsc \
     && echo "-----------------------------" \
-    && echo "Checking /usr/local/ups/bin/nut-scanner:" \
-    && file /usr/local/ups/bin/nut-scanner \
-    && ldd /usr/local/ups/bin/nut-scanner
+    && echo "Checking /nut/bin/nut-scanner:" \
+    && file /nut/bin/nut-scanner \
+    && ldd /nut/bin/nut-scanner
 
 # 验证阶段（添加库存在性检查）
 #RUN echo "关键共享库验证：" \
