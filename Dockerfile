@@ -44,7 +44,7 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
 # 验证安装结果（输出关键组件版本）
 RUN echo "NUT components version:" \
     && export PATH=/usr/local/ups/bin:$PATH \
-    && source ~/.profile \
+    && . ~/.profile 2>/dev/null || true \
     && upsd -h \
     && upsc -h \
     && nut-scanner -h \
