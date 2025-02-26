@@ -38,7 +38,6 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
-        LDFLAGS="-static" \
     && make -j$(nproc) \
     && make install
 
