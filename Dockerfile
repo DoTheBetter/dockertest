@@ -77,26 +77,6 @@ RUN apk add --no-cache \
         nss openssl musl libgcc libusb libmodbus neon \
         avahi eudev net-snmp-tools perl
 
-# 配置lighttpd（Alpine无需单独安装mod_cgi）
-RUN echo "server.document-root = \"/nut/html\"" > /etc/lighttpd/lighttpd.conf \
-    && echo "server.port = 80" >> /etc/lighttpd/lighttpd.conf \
-    && echo "server.modules += ( \"mod_cgi\" )" >> /etc/lighttpd/lighttpd.conf \
-    && echo "cgi.assign = ( \".cgi\" => \"\" )" >> /etc/lighttpd/lighttpd.conf \
-    && echo "index-file.names += ( \"index.html\" )" >> /etc/lighttpd/lighttpd.conf \
-    && mkdir -p /var/run/lighttpd \
-    && chmod 755 /nut/cgi-bin/*.cgi \
-    && sed -i 's|#!/usr/bin/perl|#!/usr/bin/env perl|' /nut/cgi-bin/*.cgi
-
-# 验证步骤
-RUN echo "验证关键组件：" \
-    && which lighttpd && lighttpd -v \
-    && echo "CGI脚本权限：" \
-    && ls -l /nut/cgi-bin/*.cgi \
-    && echo "测试CGI执行：" \
-    && echo "Status: 200 OK\nContent-type: text/html\n\n" > /tmp/test.html \
-    && SCRIPT_NAME=/upsstats.cgi SERVER_PORT=80 /nut/cgi-bin/upsstats.cgi >> /tmp/test.html \
-    && grep "UPS" /tmp/test.html
-
 # 分步验证（避免单个命令失败导致构建终止）
 RUN set -ex && \
     echo "验证环境变量：" && \
@@ -118,6 +98,36 @@ RUN set -ex && \
     upsd -V && \
     upsc -V && \
     nut-scanner -V
+
+# 配置lighttpd（Alpine无需单独安装mod_cgi）
+RUN echo "server.document-root = \"/nut/html\"" > /etc/lighttpd/lighttpd.conf \
+    && echo "server.port = 80" >> /etc/lighttpd/lighttpd.conf \
+    && echo "server.modules += ( \"mod_cgi\" )" >> /etc/lighttpd/lighttpd.conf \
+    && echo "cgi.assign = ( \".cgi\" => \"\" )" >> /etc/lighttpd/lighttpd.conf \
+    && echo "index-file.names += ( \"index.html\" )" >> /etc/lighttpd/lighttpd.conf \
+    && mkdir -p /var/run/lighttpd \
+    && chmod 755 /nut/cgi-bin/*.cgi \
+    && sed -i 's|#!/usr/bin/perl|#!/usr/bin/env perl|' /nut/cgi-bin/*.cgi
+
+# 验证步骤
+RUN echo "验证关键组件：" \
+    && which lighttpd && lighttpd -v \
+    && echo "CGI脚本权限：" \
+    && ls -l /nut/cgi-bin/*.cgi \
+    && echo "测试CGI执行：" \
+    && cp /nut/etc/nut.conf.sample /nut/etc/nut.conf \
+    && sed -i 's/^#MODE=.*/MODE=standalone/' /nut/etc/nut.conf \
+    && echo "Status: 200 OK\nContent-type: text/html\n\n" > /tmp/test.html \
+    && SCRIPT_NAME=/upsstats.cgi SERVER_PORT=80 /nut/cgi-bin/upsstats.cgi >> /tmp/test.html \
+    && grep "UPS" /tmp/test.html
+
+# 最终验证
+RUN echo "最终服务检查：" \
+    && echo "运行模式：$(grep '^MODE=' /nut/etc/nut.conf)" \
+    && echo "关键服务路径：" \
+    && which upsd && which upsdrvctl \
+    && echo "动态库依赖：" \
+    && ldd $(which upsd) | grep -E 'nut/lib|not found'
 
 EXPOSE 80
 CMD ["lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
