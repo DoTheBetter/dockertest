@@ -68,9 +68,9 @@ RUN for f in /nut/sbin/*; do \
 FROM alpine:3.21
 COPY --from=builder /nut /nut
 
-# 设置环境变量（修复LD_LIBRARY_PATH定义）
+# 设置环境变量（修复LD_LIBRARY_PATH未定义警告）
 ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
-    LD_LIBRARY_PATH="/nut/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    LD_LIBRARY_PATH="/nut/lib"
 
 RUN apk add --no-cache \
         lighttpd \
