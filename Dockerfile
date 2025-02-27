@@ -73,9 +73,9 @@ ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
     LD_LIBRARY_PATH="/nut/lib:/usr/lib:/lib:/usr/local/lib"
 
 RUN apk add --no-cache \
-        lighttpd \
-        libtool nss openssl musl libgcc libusb libmodbus neon \
-        avahi eudev net-snmp-tools perl
+        lighttpd perl \
+        libtool hidapi eudev openssl-dev libmodbus-dev libusb-dev net-snmp-dev \
+        neon-dev nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev
 
 # 分步验证（避免单个命令失败导致构建终止）
 RUN set -ex && \
@@ -117,6 +117,7 @@ RUN echo "验证关键组件：" \
     && ls -l /nut/cgi-bin/*.cgi \
     && echo "测试CGI执行：" \
     && cp /nut/etc/nut.conf.sample /nut/etc/nut.conf \
+    && cp /nut/etc/hosts.conf.sample /nut/etc/hosts.conf \
     && sed -i 's/^#MODE=.*/MODE=standalone/' /nut/etc/nut.conf \
     && echo "Status: 200 OK\nContent-type: text/html\n\n" > /tmp/test.html \
     && SCRIPT_NAME=/upsstats.cgi SERVER_PORT=80 /nut/cgi-bin/upsstats.cgi >> /tmp/test.html \
