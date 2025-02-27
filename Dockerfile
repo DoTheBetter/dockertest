@@ -83,7 +83,7 @@ RUN echo "验证环境变量配置：" \
     && echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" \
     && echo -n "upsc路径：" && which upsc \
     && echo -n "upsd路径：" && which upsd \
-    && echo "upsd库依赖：" && ldd $(which upsd) | grep -E 'nut/lib|not found'
+    && echo "upsd库依赖：" && ldd $(which upsd) | grep -E 'nut/lib|not found' \
     && upsd -h \
     && upsc -h \
     && nut-scanner -h
