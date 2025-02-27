@@ -1,6 +1,7 @@
-# 第一阶段：构建NUT（保持原样不变）
-FROM alpine:3.21 AS builder
+# 构建阶段：安装编译环境和构建NUT
+FROM alpine:3.21
 
+# 安装编译依赖
 RUN apk add --no-cache --virtual .build-deps \
         build-base linux-headers autoconf automake \
         wget tar tree
@@ -9,6 +10,7 @@ RUN apk add --no-cache \
         libtool hidapi eudev openssl-dev libmodbus-dev libusb-dev net-snmp-dev \
         neon-dev nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev
 
+# 下载并编译安装
 RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-2.8.2.tar.gz -O /tmp/nut.tar.gz \
     && tar -zxvf /tmp/nut.tar.gz -C /tmp \
     && cd /tmp/nut-2.8.2 \
@@ -36,10 +38,10 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v2.8.2/nut-
         --without-powerman \
         --without-ipmi \
         --without-freeipmi \
-        --without-doc \
     && make -j$(nproc) \
     && make install
 
+# 验证安装结果（输出关键组件版本）
 RUN echo "/nut目录结构：" \
     && tree /nut \
     && echo "NUT components version:" \
@@ -50,6 +52,7 @@ RUN echo "/nut目录结构：" \
     && /nut/bin/upsc -V \
     && /nut/bin/nut-scanner -V
 
+#验证是否为静态
 RUN for f in /nut/sbin/*; do \
         echo "Checking $f:"; \
         file "$f"; \
@@ -64,49 +67,6 @@ RUN for f in /nut/sbin/*; do \
     && file /nut/bin/nut-scanner \
     && ldd /nut/bin/nut-scanner
 
-# 第二阶段：运行环境
-FROM alpine:3.21
-COPY --from=builder /nut /nut
-
-# 设置环境变量和运行时依赖
-ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
-    LD_LIBRARY_PATH="/nut/lib:${LD_LIBRARY_PATH}"
-
-RUN apk add --no-cache \
-        lighttpd \
-        nss openssl musl libgcc libusb libmodbus neon \
-        avahi eudev net-snmp-tools perl
-
-# 验证环境变量和路径
-RUN echo "验证环境变量：" \
-    && echo "PATH=$PATH" \
-    && echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" \
-    && which upsc \
-    && which upsd \
-    && ldd $(which upsd) | grep 'nut/lib' \
-    && upsd -h \
-    && upsc -h \
-    && nut-scanner -h
-
-# 配置lighttpd（Alpine无需单独安装mod_cgi）
-RUN echo "server.document-root = \"/nut/html\"" > /etc/lighttpd/lighttpd.conf \
-    && echo "server.port = 80" >> /etc/lighttpd/lighttpd.conf \
-    && echo "server.modules += ( \"mod_cgi\" )" >> /etc/lighttpd/lighttpd.conf \
-    && echo "cgi.assign = ( \".cgi\" => \"\" )" >> /etc/lighttpd/lighttpd.conf \
-    && echo "index-file.names += ( \"index.html\" )" >> /etc/lighttpd/lighttpd.conf \
-    && mkdir -p /var/run/lighttpd \
-    && chmod 755 /nut/cgi-bin/*.cgi \
-    && sed -i 's|#!/usr/bin/perl|#!/usr/bin/env perl|' /nut/cgi-bin/*.cgi
-
-# 验证步骤
-RUN echo "验证关键组件：" \
-    && which lighttpd && lighttpd -v \
-    && echo "CGI脚本权限：" \
-    && ls -l /nut/cgi-bin/*.cgi \
-    && echo "测试CGI执行：" \
-    && echo "Status: 200 OK\nContent-type: text/html\n\n" > /tmp/test.html \
-    && SCRIPT_NAME=/upsstats.cgi SERVER_PORT=80 /nut/cgi-bin/upsstats.cgi >> /tmp/test.html \
-    && grep "UPS" /tmp/test.html
-
-EXPOSE 80
-CMD ["lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
+# 验证阶段（添加库存在性检查）
+#RUN echo "关键共享库验证：" \
+#    && ls -l /usr/lib/libupsclient.so*
