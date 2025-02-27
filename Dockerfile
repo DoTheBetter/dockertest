@@ -68,22 +68,22 @@ RUN for f in /nut/sbin/*; do \
 FROM alpine:3.21
 COPY --from=builder /nut /nut
 
-# 设置环境变量和运行时依赖
+# 设置环境变量（修复LD_LIBRARY_PATH定义）
 ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
-    LD_LIBRARY_PATH="/nut/lib:${LD_LIBRARY_PATH}"
+    LD_LIBRARY_PATH="/nut/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 RUN apk add --no-cache \
         lighttpd \
         nss openssl musl libgcc libusb libmodbus neon \
         avahi eudev net-snmp-tools perl
 
-# 验证环境变量和路径
-RUN echo "验证环境变量：" \
-    && echo "PATH=$PATH" \
-    && echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" \
-    && which upsc \
-    && which upsd \
-    && ldd $(which upsd) | grep 'nut/lib' \
+# 验证步骤（增强环境变量检查）
+RUN echo "验证环境变量配置：" \
+    && echo "PATH=${PATH}" \
+    && echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" \
+    && echo -n "upsc路径：" && which upsc \
+    && echo -n "upsd路径：" && which upsd \
+    && echo "upsd库依赖：" && ldd $(which upsd) | grep -E 'nut/lib|not found'
     && upsd -h \
     && upsc -h \
     && nut-scanner -h
