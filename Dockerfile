@@ -68,25 +68,14 @@ RUN for f in /nut/sbin/*; do \
 FROM alpine:3.21
 COPY --from=builder /nut /nut
 
-# 设置环境变量（修复LD_LIBRARY_PATH未定义警告）
+# 设置环境变量并添加系统库路径
 ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
-    LD_LIBRARY_PATH="/nut/lib"
+    LD_LIBRARY_PATH="/nut/lib:/usr/lib:/lib:/usr/local/lib"
 
 RUN apk add --no-cache \
         lighttpd \
         nss openssl musl libgcc libusb libmodbus neon \
         avahi eudev net-snmp-tools perl
-
-# 验证步骤（增强环境变量检查）
-RUN echo "验证环境变量配置：" \
-    && echo "PATH=${PATH}" \
-    && echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" \
-    && echo -n "upsc路径：" && which upsc \
-    && echo -n "upsd路径：" && which upsd \
-    && echo "upsd库依赖：" && ldd $(which upsd) | grep -E 'nut/lib|not found' \
-    && upsd -h \
-    && upsc -h \
-    && nut-scanner -h
 
 # 配置lighttpd（Alpine无需单独安装mod_cgi）
 RUN echo "server.document-root = \"/nut/html\"" > /etc/lighttpd/lighttpd.conf \
@@ -107,6 +96,28 @@ RUN echo "验证关键组件：" \
     && echo "Status: 200 OK\nContent-type: text/html\n\n" > /tmp/test.html \
     && SCRIPT_NAME=/upsstats.cgi SERVER_PORT=80 /nut/cgi-bin/upsstats.cgi >> /tmp/test.html \
     && grep "UPS" /tmp/test.html
+
+# 分步验证（避免单个命令失败导致构建终止）
+RUN set -ex && \
+    echo "验证环境变量：" && \
+    echo "PATH=${PATH}" && \
+    echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" && \
+    echo "关键组件路径验证：" && \
+    which upsc && \
+    which upsd && \
+    which nut-scanner
+
+RUN set -ex && \
+    echo "动态库依赖检查：" && \
+    ldd /nut/sbin/upsd | grep -E 'nut/lib|not found' && \
+    ldd /nut/bin/upsc | grep -E 'nut/lib|not found' && \
+    ldd /nut/bin/nut-scanner | grep -E 'nut/lib|not found'
+
+RUN set -ex && \
+    echo "版本验证：" && \
+    upsd -V && \
+    upsc -V && \
+    nut-scanner -V
 
 EXPOSE 80
 CMD ["lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
