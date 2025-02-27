@@ -74,7 +74,7 @@ ENV PATH="/nut/bin:/nut/sbin:${PATH}" \
 
 RUN apk add --no-cache \
         lighttpd \
-        nss openssl musl libgcc libusb libmodbus neon \
+        libtool nss openssl musl libgcc libusb libmodbus neon \
         avahi eudev net-snmp-tools perl
 
 # 分步验证（避免单个命令失败导致构建终止）
