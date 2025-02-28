@@ -1,0 +1,9 @@
+#!/command/with-contenv sh
+
+echo "+正在启动 nut 服务..."
+# 启动驱动
+exec upsdrvctl -u root start
+# 启动服务端
+exec upsd -u root
+# 启动监控服务
+exec s6-setuidgid nut upsmon -F
