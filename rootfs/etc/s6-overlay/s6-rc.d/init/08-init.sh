@@ -17,7 +17,7 @@ echo "3.nut相关设置"
 #NUT作为网络UPS工具，主要包含几个组件：驱动（upsdrvctl）、服务端（upsd）、监控端（upsmon）等。在netserver模式下，应该是要运行upsd作为服务器，让其他客户端可以连接到这个服务器获取UPS的状态
 #ups.conf配置UPS设备，upsd.conf配置服务器参数，upsd.users设置用户权限，upsmon.conf用于监控，nut.conf设置运行模式等
 mkdir -p /conf
-cp -f /nut/etc /conf
+cp -f /nut/etc/* /conf/
 
 if [ ! -e /conf/nut.conf ]; then
 echo "→3.1初始定义NUT运行模式为netserver >>nut.conf"
@@ -103,7 +103,7 @@ else
     echo "→3.5文件已存在，跳过 upsmon.conf 设置"
 fi
 
-ln -s /conf /nut/etc
+ln -sf /conf /nut/etc
 
 # 创建运行时目录并设置权限
 mkdir -p /var/run/nut
