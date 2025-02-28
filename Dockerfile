@@ -92,5 +92,5 @@ RUN echo "版本验证：" \
     && upsmon -V
 
 WORKDIR /nut
-EXPOSE 3493 80
+EXPOSE 3493 8080
 ENTRYPOINT [ "/init" ]

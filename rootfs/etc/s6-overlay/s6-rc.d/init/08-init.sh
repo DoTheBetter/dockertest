@@ -31,15 +31,24 @@ fi
 
 if [ ! -e /conf/ups.conf ]; then
 echo "→3.2初始配置连接的UPS设备，指定驱动和参数 >>ups.conf"
+cat >/conf/dummy-ups.dev <<EOF
+# /conf/dummy-ups.dev
+# 模拟UPS定义文件，测试用，正式使用可删除
+ups.status: OL
+battery.charge: 100
+input.voltage: 230.0
+output.voltage: 230.0
+ups.load: 15
+EOF
 cat >/conf/ups.conf <<EOF
 #配置连接的UPS设备，指定驱动和参数
 #可以通过nut-scanner命令扫描获得配置信息
 #用法见https://networkupstools.org/docs/man/nut-scanner.html
 #测试用虚拟ups
 [virtualups]
-    driver = "dummy-ups"
-    port = "/nut/bin/dummy-ups"
-    desc = "Virtual UPS for Testing"
+    driver = dummy-ups
+    port = /conf/dummy-ups.dev
+    desc = "Virtual UPS for testing"
 #威联通示例：名称qnapups不能改变
 #[qnapups]
 #        driver = "snmp-ups"
