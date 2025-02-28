@@ -18,6 +18,9 @@ RUN wget -q https://github.com/networkupstools/nut/releases/download/v${NUT_VERS
         --disable-static \
         --enable-strip \
         --prefix=/nut \
+		--with-statepath=/var/run/nut \
+		--with-altpidpath=/var/run/nut \
+		--with-udev-dir=/usr/lib/udev \
         --with-user=nut \
         --with-group=nut \
         --with-nss \
