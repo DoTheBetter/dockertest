@@ -103,6 +103,7 @@ else
     echo "→3.5文件已存在，跳过 upsmon.conf 设置"
 fi
 
+rm -rf /nut/etc
 ln -sf /conf /nut/etc
 
 # 创建运行时目录并设置权限
