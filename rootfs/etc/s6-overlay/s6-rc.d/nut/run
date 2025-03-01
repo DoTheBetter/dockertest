@@ -2,8 +2,8 @@
 
 echo "+正在启动 nut 服务..."
 # 启动驱动
-upsdrvctl -u root start
+exec upsdrvctl -F start
 # 启动服务端 前台模式
-exec upsd -u root -F
+exec upsd -F
 # 启动监控服务 前台模式
-exec s6-setuidgid nut upsmon -F
+exec upsmon -F -u nut
