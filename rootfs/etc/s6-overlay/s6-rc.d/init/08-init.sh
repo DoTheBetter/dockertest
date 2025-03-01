@@ -13,6 +13,8 @@ addgroup -g ${NUT_GID} nut
 adduser -D -H -u ${NUT_UID} -G nut -s /sbin/nologin nut
 addgroup http
 adduser -D -H -G http -s /sbin/nologin http
+#加入设备组
+usermod -aG dialout nut
 
 echo "3. nut 相关设置"
 # 设置配置文件
@@ -156,7 +158,7 @@ echo "5. 修复文件权限"
 mkdir -p /var/run/nut
 chown -R nut:nut /var/run/nut
 chmod -R 770 /var/run/nut
-chown -R nut:nut /conf
+chown -R root:nut /conf
 chmod -R 644 /conf
 
 # lighttpd
