@@ -48,7 +48,8 @@ RUN echo "/nut 目录结构：" \
     && /nut/bin/nut-scanner -h \
     && /nut/sbin/upsd -h \
     && /nut/sbin/upsdrvctl -h \
-    && /nut/sbin/upsmon -h
+    && /nut/sbin/upsmon -h \
+    && /nut/sbin/upssched -h
 
 FROM alpine:3.21
 ARG S6_VER=3.2.0.2
@@ -82,14 +83,13 @@ RUN apk add --no-cache \
         /var/cache/apk/* \
         /var/lib/apk/lists/* \
         /var/tmp/* \
-        $HOME/.cache
-
-RUN echo "版本验证：" \
+        $HOME/.cache \
+    # 版本验证
     && upsd -V \
-    && upsc -V \
     && nut-scanner -V \
     && upsdrvctl -V \
-    && upsmon -V
+    && upsmon -V \
+    && upssched -V
 
 WORKDIR /nut
 EXPOSE 3493 8080

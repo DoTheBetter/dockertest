@@ -154,9 +154,9 @@ fi
 echo "5. 修复文件权限"
 # nut
 mkdir -p /var/run/nut
-chown -R root:nut /var/run/nut
+chown -R nut:nut /var/run/nut
 chmod -R 770 /var/run/nut
-chown -R root:nut /conf
+chown -R nut:nut /conf
 chmod -R 644 /conf
 
 # lighttpd
