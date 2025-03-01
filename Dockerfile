@@ -69,7 +69,7 @@ RUN apk add --no-cache \
     tzdata ca-certificates lighttpd perl \
     libtool hidapi eudev openssl-dev libmodbus-dev libusb-dev net-snmp-dev \
     neon-dev nss-dev nss_wrapper-dev gd-dev avahi-dev i2c-tools-dev \
-    # 安装s6-overlay
+# 安装s6-overlay
     && if [ "$(uname -m)" = "x86_64" ]; then s6_arch=x86_64; \
     elif [ "$(uname -m)" = "aarch64" ]; then s6_arch=aarch64; \
     elif [ "$(uname -m)" = "armv7l" ]; then s6_arch=arm; fi \
@@ -77,21 +77,15 @@ RUN apk add --no-cache \
     && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-${s6_arch}.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-${s6_arch}.tar.xz \
-    # 备份nut配置文件并重命名
+# 备份nut配置文件并重命名
 	&& mv /nut/etc /nut/etc.bak \
-    # 清除缓存
+# 清除缓存
     && rm -rf \
         /tmp/* \
         /var/cache/apk/* \
         /var/lib/apk/lists/* \
         /var/tmp/* \
-        $HOME/.cache \
-    # 版本验证
-    && upsd -V \
-    && nut-scanner -V \
-    && upsdrvctl -V \
-    && upsmon -V \
-    && upssched -V
+        $HOME/.cache
 
 WORKDIR /nut
 EXPOSE 3493 8080
