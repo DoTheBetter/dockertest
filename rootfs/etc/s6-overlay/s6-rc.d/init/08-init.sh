@@ -179,7 +179,7 @@ echo 0 > /run/upsmon.pid
 
 chown -R nut:nut /conf
 chmod 755 /conf
-find /conf -type f -exec chmod 644 {} \;
+find /conf -type f ! -name "*.html" -exec chmod 640 {} +
 
 # lighttpd
 if [ "$WEB" = "true" ]; then
@@ -187,6 +187,7 @@ if [ "$WEB" = "true" ]; then
     chmod -R 755 /nut/cgi-bin
     chown http:http /lighttpd.conf
     chmod 644 /lighttpd.conf
+    find /conf -type f -name "*.html" -exec chmod 644 {} +
 else
     echo "→ 未设置启动 lighttpd 服务"
 fi

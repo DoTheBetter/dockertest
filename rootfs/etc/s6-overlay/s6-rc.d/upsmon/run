@@ -1,6 +1,6 @@
 #!/command/with-contenv sh
 
-echo "+3.正在启动 upsmon 监控服务..."
 sleep 1
+echo "+3.正在启动 upsmon 监控服务..."
 # 启动监控服务 调试+前台模式
-exec upsmon -D -u nut
+exec upsmon -D
