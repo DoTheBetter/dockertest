@@ -1,0 +1,5 @@
+#!/command/with-contenv sh
+
+echo "+正在启动 upsdrvctl 驱动服务..."
+# 启动驱动 调试+前台模式
+exec upsdrvctl -D -F start
