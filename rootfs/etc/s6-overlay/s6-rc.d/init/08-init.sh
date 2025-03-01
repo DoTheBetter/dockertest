@@ -5,10 +5,9 @@ echo "+ 正在运行初始化任务..."
 echo "1. 设置系统时区"
 # 设置时区 https://wiki.alpinelinux.org/wiki/Setting_the_timezone
 ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
-# 显示信息
 echo "→ 当前服务器时间: $(date "+%Y-%m-%d %H:%M:%S")"
 
-echo "2. 创建用户组"
+echo "2. 首次启动时创建用户组"
 # ========== 仅首次启动时创建 nut 用户/组（固定 UID/GID） ==========
 if ! getent group nut >/dev/null; then
     addgroup -g "${NUT_GID:-1000}" nut
@@ -89,6 +88,7 @@ EOF
     driver = dummy-ups
     port = /conf/dummy-ups.dev
     desc = "Virtual UPS for testing"
+
 EOF
 else
     echo "→ 文件存在，跳过 ups.conf 设置"
@@ -173,8 +173,9 @@ echo "5. 修复文件权限"
 mkdir -p /var/run/nut
 chown -R nut:nut /var/run/nut
 chmod -R 770 /var/run/nut
-chown -R root:nut /conf
-chmod -R 644 /conf
+chown -R nut:nut /conf
+chmod 755 /conf
+find /conf -type f -exec chmod 644 {} \;
 
 # lighttpd
 if [ "$WEB" = "true" ]; then

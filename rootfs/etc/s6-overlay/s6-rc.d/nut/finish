@@ -1,8 +1,4 @@
 #!/command/with-contenv sh
 
 echo "+正在清理PID文件..."
-
 rm -rf /var/run/nut/*
-
-# 停止容器
-/run/s6/basedir/bin/halt
