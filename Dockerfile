@@ -77,6 +77,8 @@ RUN apk add --no-cache \
     && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-${s6_arch}.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-${s6_arch}.tar.xz \
+    # 备份nut配置文件并重命名
+	&& mv /nut/etc /nut/etc.bak \
     # 清除缓存
     && rm -rf \
         /tmp/* \

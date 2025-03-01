@@ -9,12 +9,29 @@ ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
 echo "→ 当前服务器时间: $(date "+%Y-%m-%d %H:%M:%S")"
 
 echo "2. 创建用户组"
-addgroup -g ${NUT_GID} nut
-adduser -D -H -u ${NUT_UID} -G nut -s /sbin/nologin nut
+# ========== 强制覆盖 nut 用户/组（使用指定 UID/GID） ==========
+if getent passwd nut >/dev/null; then
+    deluser nut >/dev/null 2>&1 || true
+fi
+
+if getent group nut >/dev/null; then
+    delgroup nut >/dev/null 2>&1 || true
+fi
+
+addgroup -g "${NUT_GID:-1000}" nut
+adduser -D -H -u "${NUT_UID:-1000}" -G nut -s /sbin/nologin nut
+
+# ================== 强制覆盖 http 用户/组 ==================
+if getent passwd http >/dev/null; then
+    deluser http >/dev/null 2>&1 || true
+fi
+
+if getent group http >/dev/null; then
+    delgroup http >/dev/null 2>&1 || true
+fi
+
 addgroup http
 adduser -D -H -G http -s /sbin/nologin http
-#加入设备组
-usermod -aG dialout nut
 
 echo "3. nut 相关设置"
 # 设置配置文件
@@ -22,7 +39,7 @@ echo "3. nut 相关设置"
 # 在 netserver 模式下，应该是要运行 upsd 作为服务器，让其他客户端可以连接到这个服务器获取 UPS 的状态
 # ups.conf 配置 UPS 设备，upsd.conf 配置服务器参数，upsd.users 设置用户权限，upsmon.conf 用于监控，nut.conf 设置运行模式等
 mkdir -p /conf
-cp -f /nut/etc/* /conf/
+cp -rf /nut/etc.bak/* /conf/
 
 if [ ! -e /conf/nut.conf ]; then
     echo "→ 初始定义 NUT 运行模式为 netserver >> nut.conf"
@@ -118,7 +135,6 @@ else
     echo "→ 文件已存在，跳过 upsmon.conf 设置"
 fi
 
-rm -rf /nut/etc
 ln -sf /conf /nut/etc
 
 echo "4. lighttpd 相关设置"
