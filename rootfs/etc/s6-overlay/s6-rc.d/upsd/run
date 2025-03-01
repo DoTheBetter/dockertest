@@ -1,6 +1,6 @@
 #!/command/with-contenv sh
 
-sleep 1
+sleep 3
 echo "+2.正在启动 upsd 服务端..."
-# 启动服务端 调试+前台模式
-exec upsd -D
+echo "启动命令：\"upsd $UPSD_OPTS\""
+exec upsd $UPSD_OPTS

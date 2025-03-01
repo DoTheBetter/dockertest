@@ -53,11 +53,39 @@ if [ ! -e /conf/ups.conf ]; then
     cat >/conf/dummy-ups.dev <<EOF
 # /conf/dummy-ups.dev
 # 模拟 UPS 定义文件，测试用，正式使用可删除
-ups.status: OL
-battery.charge: 100
-input.voltage: 230.0
-output.voltage: 230.0
-ups.load: 15
+# ================================================
+# Network UPS Tools - Dummy UPS Device Configuration
+# 全参数模拟文件，无真实硬件依赖
+# ================================================
+# ----------------------------
+# 基础电源状态参数
+# ----------------------------
+input.voltage: 230       # 输入电压（伏特）
+output.voltage: 230      # 输出电压（伏特）
+battery.charge: 100      # 电池电量（0-100%）
+battery.charge.low: 20   # 低电量警告阈值（%）
+battery.runtime: 3600    # 剩余运行时间（秒）
+ups.load: 30             # 当前负载百分比（%）
+
+# ----------------------------
+# UPS 状态与模式
+# ----------------------------
+ups.status: OL           # 状态：OL（在线）, OB（电池供电）
+ups.temperature: 25.5    # 内部温度（摄氏度）
+ups.realpower.nominal: 600  # 额定功率（瓦）
+
+# ----------------------------
+# 延迟与定时控制
+# ----------------------------
+ups.delay.start: 30      # 市电恢复后启动延迟（秒）
+ups.delay.shutdown: 60    # 断电后关机延迟（秒）
+ups.timer.shutdown: 300   # 关机倒计时（秒）
+
+# ----------------------------
+# 自检与维护参数
+# ----------------------------
+ups.test.interval: 604800  # 自检间隔（秒，默认7天）
+ups.test.result: OK       # 自检结果：OK（正常）, NG（异常）
 EOF
     cat >/conf/ups.conf <<EOF
 # 配置连接的 UPS 设备，指定驱动和参数
@@ -188,6 +216,8 @@ if [ "$WEB" = "true" ]; then
     chown http:http /lighttpd.conf
     chmod 644 /lighttpd.conf
     find /conf -type f -name "*.html" -exec chmod 644 {} +
+    chmod 644 /conf/hosts.conf
+    
 else
     echo "→ 未设置启动 lighttpd 服务"
 fi
