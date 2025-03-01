@@ -171,8 +171,12 @@ fi
 echo "5. 修复文件权限"
 # nut
 mkdir -p /var/run/nut
+echo 0 > /var/run/nut/upsd.pid
 chown -R nut:nut /var/run/nut
 chmod -R 770 /var/run/nut
+
+echo 0 > /run/upsmon.pid
+
 chown -R nut:nut /conf
 chmod 755 /conf
 find /conf -type f -exec chmod 644 {} \;
