@@ -36,7 +36,7 @@ if [ "$SSH" = "true" ]; then
         touch /conf/.ssh/authorized_keys
     fi
     chmod 0600 /conf/.ssh/authorized_keys
-
+    
     echo "说明："
     echo "SSH密钥位于 /conf/.ssh 目录中。"
     echo "您可以将发起同步的客户端 *.pub 文件内容复制到远程主机的 authorized_keys 文件中，以实现免密登录。"
