@@ -13,8 +13,8 @@ collections:
   - VPS系统安装
 featuredImage: https://www.bing.com/th?id=OHR.NevadaBigHorns_ZH-CN5987046965_800x480.jpg
 featuredImagePreview: https://www.bing.com/th?id=OHR.NevadaBigHorns_ZH-CN5987046965_800x480.jpg
-dir: posts
 blog: "true"
+dir: posts
 ---
 
 ‌‌‌‌　　这几天我的 VPS 接连出现来自欧洲 IP 的访问，目标直指 SSH 端口。虽说安全措施已经加固，但是看着日志心烦，直接用 ufw 给封了。我在网络上搜寻有没有现成的恶意 ip 列表，偶然发现两份由国内高校提供的 IP 黑名单清单，我直接在我的 VPS 上用上了。  
@@ -103,7 +103,3 @@ while true; do
  sleep 5
 done
 ```
-
-
-## 添加测试
-## 13
