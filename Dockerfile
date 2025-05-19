@@ -47,7 +47,7 @@ RUN apk add --no-cache \
     && mkdir -p /aria2/www \
     && wget -P /tmp https://github.com/alexhua/Aria2-Explorer/archive/refs/heads/master.zip \
     && mkdir -p /tmp/Aria2-Explorer \
-    && unzip /tmp/Aria2-Explorer-master.zip -d /tmp/Aria2-Explorer \
+    && unzip /tmp/master.zip -d /tmp/Aria2-Explorer \
     && cp -r /tmp/Aria2-Explorer/Aria2-Explorer-master/ui/ariang/* /aria2/www/ \
     && ls /aria2/www \
 # 安装filebrowser
