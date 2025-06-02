@@ -2,9 +2,7 @@
     # 全局日志格式设置
     log {
         format json {
-            # 使用ISO 9075格式（例：2025-06-02 18:48:15）
-            time_format iso9075
-            # 启用本地时区（默认UTC）
+            time_format "2025-06-02 18:48:15"
             time_local
         }
     }
