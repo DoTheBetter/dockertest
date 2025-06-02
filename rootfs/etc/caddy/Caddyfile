@@ -1,6 +1,23 @@
+{
+    # 全局日志格式设置
+    log {
+        format json {
+            # 使用ISO 8601格式（例：2025-06-02T12:39:15Z）
+            time_format iso8601
+            # 启用本地时区（默认UTC）
+            time_local
+        }
+    }
+}
+
+# 站点配置
 :8080 {
+    # 设置网站根目录
     root * /www
+    # 启用静态文件服务
     file_server
+    # 启用压缩
     encode zstd gzip
+    # 单页应用路由支持
     try_files {path} /index.html
 }
