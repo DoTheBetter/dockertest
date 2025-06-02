@@ -2,7 +2,7 @@
     # 全局日志格式设置
     log {
         format json {
-            time_format "2025-06-02 18:48:15"
+            time_format "2006-01-02 15:04:05"
             time_local
         }
     }
