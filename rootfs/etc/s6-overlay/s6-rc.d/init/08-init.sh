@@ -11,6 +11,6 @@ echo "→当前服务器时间:$(date "+%Y-%m-%d %H:%M:%S")"
 echo "2.修改文件夹权限"
 chown -R http:http /www
 chmod -R 755 /www
-chown http:http /caddyfile
-chmod 644 /caddyfile
+chown -R http:http /etc/caddy
+chmod 644 /etc/caddy/Caddyfile
 

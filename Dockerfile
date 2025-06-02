@@ -7,6 +7,7 @@ FROM alpine:3.21
 ARG S6_VER=3.2.1.0
 
 ENV S6_VERBOSITY=1 \
+	XDG_CONFIG_HOME=/etc/caddy \
     TZ=Asia/Shanghai
 
 COPY --from=builder /www /www
