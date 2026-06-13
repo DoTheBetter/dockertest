@@ -38,6 +38,8 @@ if [ -z "$GEOIPUPDATE_EDITION_IDS" ]; then
     exit 0
 fi
 
+echo "+正在启动 GeoIP Update 服务..."
+
 mkdir -p $GEOIPUPDATE_DB_DIR
 
 while true; do
