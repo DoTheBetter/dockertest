@@ -1,32 +1,31 @@
 # 更新日志
 
-## 2025年7月7日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250722
-1. 升级Filebrowser版本为v2.40.2
-2. 升级AriaNg版本为1.3.11
+## 2025年1月9日 更新
+更新镜像版本：dothebetter/caddy2:2.9.1
+1. 更新Caddyfile版本v2.9.1
+2. 更新MaxMind的GeoIP Update程序版本 v7.1.0
 
-## 2025年7月7日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250707
-1. 升级Filebrowser版本为v2.36.3
+## 2025年1月1日 更新
+更新镜像版本：dothebetter/caddy2:2.9.0
+1. 更新Caddyfile版本v2.9.0
 
-## 2025年6月30日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250630
-1. 升级Filebrowser版本为v2.34.2
+## 2024年11月1日 更新
+更新镜像版本：dothebetter/caddy2:2.8.4
+1. 基础镜像单独构建：ghcr.io/dothebetter/baseimage_caddy2:latest
+2. 添加Caddyfile插件github.com/greenpau/caddy-git
 
-## 2025年6月18日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250620
-1. 升级Filebrowser版本为v2.33.0
+## 2024年10月5日 更新
+更新镜像版本：dothebetter/caddy2:2.8.4
+1. 更新基础镜像alpine:3.20
+2. 更新Caddyfile版本v2.8.4
+3. 更新MaxMind的GeoIP Update程序版本v7.0.1
 
-## 2025年6月18日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250618
-1. 升级Filebrowser版本为v2.32.3
-2. 升级Alpine版本为3.22
+## 2024年3月17日 更新
+1. 更新基础镜像alpine:3.19
+2. 更新Caddyfile版本v2.7.6
+3. 更新MaxMind的GeoIP Update程序版本v6.1.0
 
-## 2025年5月19日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250519
-1. 增加日志输出标识
-
-## 2025年5月18日 更新
-镜像版本：dothebetter/aria2:1.37.0-20250517
-1. Alpine版本：3.21
-2. aria2c版本：1.37.0，AriaNg版本：1.3.10，FileBrowser版本：2.32.0
+## 2022年3月27日 更新
+1. 基础镜像alpine:3.15
+2. 集成MaxMind的GeoIP Update程序https://dev.maxmind.com/geoip/updating-databases?lang=en
+3. Caddyfile默认配置文件修改

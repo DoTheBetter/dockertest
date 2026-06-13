@@ -1,160 +1,136 @@
 ## 简介：
-
 <p align="center">
-<a target="_blank" href="https://github.com/DoTheBetter/docker/tree/master/aria2"><img alt="Static Badge" src="https://img.shields.io/badge/Github-DoTheBetter%2Fdocker-brightgreen"></a>
+<a target="_blank" href="https://github.com/DoTheBetter/docker/tree/master/caddy2"><img alt="Static Badge" src="https://img.shields.io/badge/Github-DoTheBetter%2Fdocker-brightgreen"></a>
 <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/DoTheBetter/docker?label=GitHub%20repo%20size">
-<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/DoTheBetter/docker/DockerBuild_aria2.yml?label=GitHub%20Actions%20Workflow%20Status">
+<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/DoTheBetter/docker/DockerBuild_caddy2.yml?label=GitHub%20Actions%20Workflow%20Status">
 <br>
-<a target="_blank" href="https://github.com/DoTheBetter/docker/pkgs/container/aria2"><img alt="Static Badge" src="https://img.shields.io/badge/ghcr.io-dothebetter%2Faria2-brightgreen"></a>
-<a target="_blank" href="https://hub.docker.com/r/dothebetter/aria2"><img alt="Static Badge" src="https://img.shields.io/badge/docker.io-dothebetter%2Faria2-brightgreen"></a>
-<img alt="Docker Image Version" src="https://img.shields.io/docker/v/dothebetter/aria2?label=Image%20Version">
-<img alt="Docker Image Size" src="https://img.shields.io/docker/image-size/dothebetter/aria2?label=Image%20Size">
-<img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/dothebetter/aria2?label=Docker%20Pulls">
+<a target="_blank" href="https://github.com/DoTheBetter/docker/pkgs/container/caddy2"><img alt="Static Badge" src="https://img.shields.io/badge/ghcr.io-dothebetter%2Fcaddy2-brightgreen"></a>
+<a target="_blank" href="https://hub.docker.com/r/dothebetter/caddy2"><img alt="Static Badge" src="https://img.shields.io/badge/docker.io-dothebetter%2Fcaddy2-brightgreen"></a>
+<img alt="Docker Image Version" src="https://img.shields.io/docker/v/dothebetter/caddy2?label=Image%20Version">
+<img alt="Docker Image Size" src="https://img.shields.io/docker/image-size/dothebetter/caddy2?label=Image%20Size">
+<img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/dothebetter/caddy2?label=Docker%20Pulls">
 </p>
-自用Aria2+AriaNg+FileBrowser下载镜像，基于Alpine，支持amd64、arm64v8和arm32v7架构。
 
-+ 使用基于 [myfreeer/aria2-build-msys2](https://github.com/myfreeer/aria2-build-msys2) 补丁构建的全静态多构架 [aria2c](https://github.com/DoTheBetter/aria2_build) 二进制文件
-+ 使用 [P3TERX/aria2.conf](https://github.com/P3TERX/aria2.conf) 配置方案，包含了配置文件、附加功能脚本等文件，用于实现 Aria2 功能的增强和扩展
-+ 定时更新aria2 格式的 Tracker 列表，aria2 配置文件更新后自动重启 aria2c
-+ AriaNg访问地址：http://ip:8080
-+ FileBrowser访问地址：http://ip:8081 ，使用admin/admin登录
+自用Caddy2 Alpine镜像，支持amd64;arm64v8;arm32v7系统。在Caddy官方builder镜像添加常用插件，集成Maxmind官方[GeoIP Update](https://dev.maxmind.com/geoip/updating-databases?lang=en)程序（需要注册Maxmind账号）。  
 
-项目地址：https://github.com/DoTheBetter/docker/tree/master/aria2
+项目地址：https://github.com/DoTheBetter/docker/tree/master/caddy2
 
 #### 官网地址
 
-- https://github.com/aria2/aria2
-- https://github.com/mayswind/AriaNg
-- https://github.com/filebrowser/filebrowser
+* https://caddyserver.com/ 
+* https://github.com/caddyserver/caddy
+
+####  插件列表
+
+**各插件用法详见插件地址，镜像自带部分插件配置使用示例Caddyfile.default**
+
+| 名称                         | 插件地址                                            | 说明                                                         |
+| :--------------------------- | :-------------------------------------------------- | ------------------------------------------------------------ |
+| caddy-docker-proxy/plugin/v2 | https://github.com/lucaslorentz/caddy-docker-proxy  | 该插件使 Caddy 能够通过标签用作 Docker 容器的反向代理，labels标签可与Caddyfile配置文件同时使用，Caddyfile配置文件修改后自动重载 |
+| caddy-webdav                 | https://github.com/mholt/caddy-webdav               | 提供webdav服务                                               |
+| caddy-maxmind-geolocation    | https://github.com/porech/caddy-maxmind-geolocation | 根据geoip数据库 IP 地理位置过滤请求                          |
+| caddy-security               | https://github.com/greenpau/caddy-security          | 安全认证插件                                                 |
+| caddy-dns/cloudflare         | https://github.com/caddy-dns/cloudflare             | https证书签署dns认证                                         |
+| caddy-dns/dnspod             | https://github.com/caddy-dns/dnspod                 | https证书签署dns认证                                         |
+| caddy-dns/alidns             | https://github.com/caddy-dns/alidns                 | https证书签署dns认证                                         |
+| caddy-dns/godaddy            | https://github.com/caddy-dns/godaddy                | https证书签署dns认证                                         |
+| caddy-dns/googleclouddns     | https://github.com/caddy-dns/googleclouddns         | https证书签署dns认证                                         |
+| caddy-dns/namecheap          | https://github.com/caddy-dns/namecheap              | https证书签署dns认证                                         |
+| caddy-dns/namesilo           | https://github.com/caddy-dns/namesilo               | https证书签署dns认证                                         |
+| caddy-git                    | https://github.com/greenpau/caddy-git               | 通过在 Caddy 克隆来从 git 存储库的文件，克隆操作在启动或站点被访问时发生 |
 
 ## 相关参数：
 
 #### 环境变量
-
 下面是可用于自定义安装的可用选项的完整列表。  
 |变量名|是否必须|默认值|说明|
 | :------: | :--------: | :------: | :----: |
 |`TZ`|可选|`Asia/Shanghai`|设置时区|
-|`UID`|可选|`1000`|设置aria2c运行用户ID|
-|`GID`|可选|`1000`|设置aria2c运行用户组ID|
-|`UMASK`|可选|`022`|设置新建文件的权限掩码，022表示文件默认权限为644，目录为755|
-|`ARIA2_RPC_SECRET`|可选|`无`|aria2的RPC密钥，用于AriaNg等客户端连接验证|
-|`ARIA2_RPC_LISTEN_PORT`|可选|`6800`|aria2的RPC服务监听端口|
-|`ARIA2_BT_LISTEN_PORT`|可选|`6881`|aria2的BT下载使用的端口，建议开启路由器的UPnP/NAT-PMP协议|
-|`CUSTOM_TRACKER_URL`|可选|`无`|自定义BT tracker服务器列表地址，更新脚本内置 https://github.com/XIU2/TrackersListCollection 提供的列表|
-|`UPDATE_TRACKER`|可选|`1`|自动更新BT tracker列表（天）。`不设置`或值为`0`时，禁用自动更新|
-|`ENABLE_IPV6`|可选|`false`|启用IPv6支持，`true`：启用，`false`：禁用。开启时建议使用docker镜像的网络host模式|
-|     `ENABLE_ARIANG`     |   可选   |     `true`      |       启用AriaNg管理界面，`true`：启用，`false`：禁用        |
-|  `ENABLE_FILEBROWSER`   |   可选   |     `true`      |    启用FileBrowser文件管理器，`true`：启用，`false`：禁用    |
-| `HTTP_PORT` |   可选   |     `8080`  |    AriaNg Web界面访问端口    |
-| `FILEBROWSER_PORT` |   可选   |     `8081`  |    FileBrowser文件管理器访问端口    |
+|`GEOIPUPDATE_AUTO`|可选|`false`|自动更新geoip数据库开关，`true`为开启。|
+|`GEOIPUPDATE_EDITION_IDS`|可选|`GeoLite2-Country`|geoip数据库类型：`GeoLite2-ASN`  `GeoLite2-City`  `GeoLite2-Country`。`GEOIPUPDATE_AUTO=true`时必须设置|
+|`GEOIPUPDATE_ACCOUNT_ID`|可选|无|Maxmind帐户,`GEOIPUPDATE_AUTO=true`时必须设置|
+|`GEOIPUPDATE_LICENSE_KEY`|可选|无|Maxmind API密钥,`GEOIPUPDATE_AUTO=true`时必须设置|
+|`GEOIPUPDATE_FREQUENCY`|可选|`72`|geoip数据库更新间隔（小时），注意不能为***0***。|
 
 #### 开放的端口
 
-|    范围    |                    描述                    |
-| :--------: | :----------------------------------------: |
-|   `6800`   | aria2的RPC服务端口，用于AriaNg等客户端连接 |
-|   `6881`   |     aria2的BT/DHT监听端口，用于BT下载      |
-| `6881/udp` |    aria2的BT/DHT监听udp端口，用于BT下载    |
-|   `8080`   |           AriaNg Web界面访问端口           |
-|   `8081`   |       FileBrowser文件管理器访问端口        |
+|范围|描述|
+| :----: | :----: |
+|`80`|http端口|
+|`443`|https端口|
+|`443/udp`|QUIC/HTTP3协议端口|
+|`2019`|Caddy2 API端口 ***（可选）***|
 
 #### 数据卷
 
-下面的目录用于配置，并且可以映射为持久存储。
+下面的目录用于配置，并且可以映射为持久存储。  
 
-|    文件或目录     |                 描述                 |
-| :---------------: | :----------------------------------: |
-|  `/aria2/config`  | 用于存储aria2和FileBrowser的配置文件 |
-| `/aria2/download` |       用于存储aria2下载的文件        |
+|目录|描述|
+| :----: | :----: |
+|`/config`|配置文件目录|
+|`/data`|TLS 证书、私钥、GeoIP数据和其他必要信息存储目录|
+|`/var/run/docker.sock`|宿主机Docker守护进程默认监听的Unix域套接字(Unix domain socket)|
 
 ## 部署方法：
 
-> 本镜像在 docker hub，ghcr.io 及 aliyuncs同步推送，docker hub 不能使用时可使用其他仓库
+> 本镜像在docker hub及ghcr.io同步推送，docker hub不能使用时可使用ghcr.io
 
 #### Docker Run
 
 ```bash
+docker network create web
 docker run -d \
-    --name aria2 \
-    --restart always \
-    -e TZ=Asia/Shanghai \
-    -e UID=1000 \
-    -e GID=1000 \
-    -e UMASK=022 \
-    -e ARIA2_RPC_SECRET=123456 \
-    -e ARIA2_RPC_LISTEN_PORT=6800 \
-    -e ARIA2_BT_LISTEN_PORT=6881 \
-    -e UPDATE_TRACKER=1 \
-    -e ENABLE_IPV6=false \
-    -e ENABLE_ARIANG=true \
-    -e ENABLE_FILEBROWSER=true \
-    -e HTTP_PORT=8080 \
-    -e FILEBROWSER_PORT=8081 \
-    -p 6800:6800 \
-    -p 6881:6881 \
-    -p 6881:6881/udp \
-    -p 8080:8080 \
-    -p 8081:8081 \
-    -v /docker/aria2/config:/aria2/config \
-    -v /docker/aria2/download:/aria2/download \
-    dothebetter/aria2:latest
-    #ghcr.io/dothebetter/aria2:latest
-    #registry.cn-hangzhou.aliyuncs.com/dothebetter/aria2:latest
-
-#host模式，开启ipv6
-docker run -d \
-    --name aria2 \
-    --restart always \
-    --network host \
-    -e TZ=Asia/Shanghai \
-    -e ARIA2_RPC_LISTEN_PORT=6800 \
-    -e ARIA2_BT_LISTEN_PORT=6881 \
-    -e ENABLE_IPV6=true \
-    -e ENABLE_ARIANG=true \
-    -e ENABLE_FILEBROWSER=true \
-    -e HTTP_PORT=8080 \
-    -e FILEBROWSER_PORT=8081 \
-    -v /docker/aria2/config:/aria2/config \
-    -v /docker/aria2/download:/aria2/download \
-    dothebetter/aria2:latest
+	--net web \
+	--name caddy2 \
+	--restart always \
+	--cap-add NET_ADMIN \
+	-e TZ=Asia/Shanghai \
+	-e GEOIPUPDATE_AUTO=true \
+	-e GEOIPUPDATE_EDITION_IDS=GeoLite2-Country \
+	-e GEOIPUPDATE_ACCOUNT_ID=123456 \
+	-e GEOIPUPDATE_LICENSE_KEY=123456 \
+	-e GEOIPUPDATE_FREQUENCY=24 \
+	-p 8080:80 \
+	-p 4443:443 \
+	-p 4443:443/udp \
+	-v /var/run/docker.sock:/var/run/docker.sock:ro \
+	-v /docker/caddy2/config:/config \
+	-v /docker/caddy2/data:/data \
+	dothebetter/caddy2:latest  #ghcr.io/dothebetter/caddy2:latest
 ```
 
 #### docker-compose.yml
 
 ```yaml
+version: '3'
 services:
-    aria2:
-        image: dothebetter/aria2:latest
-        #ghcr.io/dothebetter/aria2:latest
-        #registry.cn-hangzhou.aliyuncs.com/dothebetter/aria2:latest
-        container_name: aria2
-        restart: always
-        environment:
-            - TZ=Asia/Shanghai
-            - UID=1000
-            - GID=1000
-            - UMASK=022
-            - ARIA2_RPC_SECRET=123456
-            - ARIA2_RPC_LISTEN_PORT=6800
-            - ARIA2_BT_LISTEN_PORT=6881
-            - UPDATE_TRACKER=1
-            - ENABLE_IPV6=false
-            - ENABLE_ARIANG=true
-            - ENABLE_FILEBROWSER=true
-            - HTTP_PORT=8080
-            - FILEBROWSER_PORT=8081
-        ports:
-            - 6800:6800
-            - 6881:6881
-            - 6881:6881/udp
-            - 8080:8080
-            - 8081:8081
-        volumes:
-            - /docker/aria2/config:/aria2/config
-            - /docker/aria2/download:/aria2/download
+  caddy2:
+    image: dothebetter/caddy2:latest  #ghcr.io/dothebetter/caddy2:latest
+    container_name: caddy2
+    restart: always
+    networks:
+      - web
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=Asia/Shanghai
+      - GEOIPUPDATE_AUTO=true
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+      - GEOIPUPDATE_ACCOUNT_ID=123456
+      - GEOIPUPDATE_LICENSE_KEY=123456
+      - GEOIPUPDATE_FREQUENCY=24
+    ports:
+      - "8080:80"
+      - "4443:443"
+      - "4443:443/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /docker/caddy2/config:/config
+      - /docker/caddy2/data:/data
+
+networks:
+  web:
+    external: true
 ```
-
 ## 更新日志：
-
 详见 **[CHANGELOG.md](./CHANGELOG.md)**

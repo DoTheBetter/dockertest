@@ -1,78 +1,57 @@
-ARG ARIA2_DOCKER_VER=1.37.0-202606012
+ARG CADDY_VER=2.11.4
+ARG CADDY_DOCKER_VER=2.11.4-20260613
+
+FROM ghcr.io/dothebetter/baseimage_caddy2:${CADDY_VER} AS caddybuilder
+
+FROM golang:alpine AS geoipbuilder
+#https://github.com/maxmind/geoipupdate/blob/main/README.md
+RUN go install github.com/maxmind/geoipupdate/v7/cmd/geoipupdate@latest \
+	&& geoipupdate -V \
+	&& which geoipupdate
 
 FROM alpine:3.24
-
-ARG ARIA2_VER=1.37.0
-#ARG AriaNg_VER=1.3.11
-ARG FileBrowser_VER=1.3.3
 ARG S6_VER=3.2.3.0
 
-ENV PATH="/aria2/bin:${PATH}" \
-    S6_VERBOSITY=1 \
-    TZ=Asia/Shanghai \
-    UID=1000 \
-    GID=1000 \
-    UMASK=022 \
-    ARIA2_RPC_SECRET= \
-    ARIA2_RPC_LISTEN_PORT=6800 \
-    ARIA2_BT_LISTEN_PORT=6881 \
-    CUSTOM_TRACKER_URL= \
-    UPDATE_TRACKER=1 \
-    ENABLE_IPV6=false \
-    ENABLE_ARIANG=true \
-    ENABLE_FILEBROWSER=true \
-    HTTP_PORT=8080 \
-    FILEBROWSER_PORT=8081 \
-    FILEBROWSER_FFMPEG_PATH="/usr/bin/ffmpeg" \
-    FILEBROWSER_DATABASE="/aria2/config/filebrowser_quantum.db"
+ENV TZ=Asia/Shanghai \
+	#https://caddyserver.com/docs/conventions#file-locations
+	XDG_CONFIG_HOME=/config \
+	XDG_DATA_HOME=/data \
+	#https://github.com/lucaslorentz/caddy-docker-proxy
+	CADDY_DOCKER_CADDYFILE_PATH=/config/Caddyfile \
+	CADDY_DOCKER_LOG_LEVEL=WARN \
+	#https://github.com/maxmind/geoipupdate/blob/main/doc/docker.md
+	GEOIPUPDATE_AUTO=false \
+	GEOIPUPDATE_EDITION_IDS=GeoLite2-Country \
+	GEOIPUPDATE_ACCOUNT_ID= \
+	GEOIPUPDATE_LICENSE_KEY= \
+	GEOIPUPDATE_FREQUENCY=72
 
+COPY --from=caddybuilder /usr/bin/caddy /usr/bin/caddy
+COPY --from=geoipbuilder /go/bin/geoipupdate /usr/bin/geoipupdate
 COPY --chmod=755 rootfs /
 
-RUN apk add --no-cache \
-    bash curl ca-certificates tzdata findutils jq mailcap shadow ffmpeg darkhttpd \
-    && if [ "$(uname -m)" = "x86_64" ]; then s6_arch=x86_64; aria2_arch=x86_64-linux-musl; filebrowser_quantum_arch=amd64; \
-    elif [ "$(uname -m)" = "aarch64" ]; then s6_arch=aarch64; aria2_arch=aarch64-linux-musl; filebrowser_quantum_arch=arm64; \
-    elif [ "$(uname -m)" = "armv7l" ]; then s6_arch=arm; aria2_arch=armv7-linux-musleabihf; filebrowser_quantum_arch=armv7; \
-    fi \
+RUN apk upgrade --update --no-cache \
+# 安装应用
+	&& apk add --no-cache ca-certificates tzdata \
 # 安装s6-overlay
+    && if [ "$(uname -m)" = "x86_64" ]; then s6_arch=x86_64; \
+    elif [ "$(uname -m)" = "aarch64" ]; then s6_arch=aarch64; \
+    elif [ "$(uname -m)" = "armv7l" ]; then s6_arch=arm; fi \
     && wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-noarch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && wget -P /tmp https://github.com/just-containers/s6-overlay/releases/download/v${S6_VER}/s6-overlay-${s6_arch}.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-${s6_arch}.tar.xz \
-# 安装aria2
-    && mkdir -p /aria2/bin \
-    && wget -P /tmp https://github.com/DoTheBetter/aria2_build/releases/download/${ARIA2_VER}/aria2-${ARIA2_VER}-${aria2_arch}_static.zip \
-    && unzip /tmp/aria2-${ARIA2_VER}-${aria2_arch}_static.zip -d /aria2/bin \
-    && chmod +x /aria2/bin/aria2c \
-    && aria2c --version \
-# 安装Aria2-Explorer的AriaNG增强版 
-    && mkdir -p /aria2/www \
-    && wget -P /tmp https://github.com/alexhua/Aria2-Explorer/archive/refs/heads/master.zip \
-    && mkdir -p /tmp/Aria2-Explorer \
-    && unzip /tmp/master.zip -d /tmp/Aria2-Explorer \
-    && cp -r /tmp/Aria2-Explorer/Aria2-Explorer-master/ui/ariang/* /aria2/www/ \
-# 安装FileBrowser Quantum
-    && wget -O /aria2/bin/filebrowser https://github.com/gtsteffaniak/filebrowser/releases/download/v${FileBrowser_VER}-stable/linux-${filebrowser_quantum_arch}-filebrowser \
-    && chmod +x /aria2/bin/filebrowser \
-    && filebrowser version \
-# 创建用户及组
-    && addgroup download \
-    && adduser -D -H -G download -s /sbin/nologin download \
-    && addgroup http \
-    && adduser -D -H -G http -s /sbin/nologin http \
-# 设置目录权限
-    && chown -R download:download /aria2/bin \
-    && chmod -R 755 /aria2/bin \
-    && chown -R http:http /aria2/www \
-    && chmod -R 755 /aria2/www \
+# 设置执行权限
+#	&& chmod +x /usr/bin/caddy /usr/bin/geoipupdate \
+	&& caddy version \
+	&& geoipupdate -V \
 # 清除缓存
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/* \
-    && rm -rf /var/tmp/* \
-    && rm -rf $HOME/.cache
+	&& rm -rf /var/cache/apk/* \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& rm -rf /tmp/* \
+	&& rm -rf /var/tmp/* \
+	&& rm -rf $HOME/.cache
 
-WORKDIR /aria2
-VOLUME /aria2/download /aria2/config
-EXPOSE 6800 6881 6881/udp 8080 8081
-ENTRYPOINT ["/init"]
+VOLUME /config /data
+EXPOSE 80 443 443/udp 2019
+ENTRYPOINT [ "/init" ]
