@@ -42,10 +42,11 @@
 ## 相关参数：
 
 #### 环境变量
-下面是可用于自定义安装的可用选项的完整列表。  
+下面是可用于自定义安装的可用选项的完整列表。
 |变量名|是否必须|默认值|说明|
 | :------: | :--------: | :------: | :----: |
 |`TZ`|可选|`Asia/Shanghai`|设置时区|
+|`CADDY_LOG_LEVEL`|可选|`INFO`|Caddy 日志等级：`DEBUG`、`INFO`、`WARN`、`ERROR`|
 |`GEOIPUPDATE_AUTO`|可选|`false`|自动更新geoip数据库开关，`true`为开启。|
 |`GEOIPUPDATE_EDITION_IDS`|可选|`GeoLite2-Country`|geoip数据库类型：`GeoLite2-ASN`  `GeoLite2-City`  `GeoLite2-Country`。`GEOIPUPDATE_AUTO=true`时必须设置|
 |`GEOIPUPDATE_ACCOUNT_ID`|可选|无|Maxmind帐户,`GEOIPUPDATE_AUTO=true`时必须设置|
@@ -85,6 +86,7 @@ docker run -d \
 	--restart always \
 	--cap-add NET_ADMIN \
 	-e TZ=Asia/Shanghai \
+	-e CADDY_LOG_LEVEL=INFO \
 	-e GEOIPUPDATE_AUTO=true \
 	-e GEOIPUPDATE_EDITION_IDS=GeoLite2-Country \
 	-e GEOIPUPDATE_ACCOUNT_ID=123456 \
@@ -114,6 +116,7 @@ services:
       - NET_ADMIN
     environment:
       - TZ=Asia/Shanghai
+      - CADDY_LOG_LEVEL=INFO
       - GEOIPUPDATE_AUTO=true
       - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
       - GEOIPUPDATE_ACCOUNT_ID=123456
