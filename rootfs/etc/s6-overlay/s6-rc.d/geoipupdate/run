@@ -16,10 +16,8 @@ fi
 
 pid=1
 
-export GEOIPUPDATE_CONF_FILE=""
 export GEOIPUPDATE_DB_DIR=${XDG_DATA_HOME}/GeoIP
-log_file=${GEOIPUPDATE_DB_DIR}/geoipupdate.log
-flags="--output"
+flags="--output --database-directory $GEOIPUPDATE_DB_DIR"
 frequency=$((GEOIPUPDATE_FREQUENCY * 60 * 60))
 
 if [ -z "$GEOIPUPDATE_ACCOUNT_ID" ]; then
@@ -44,7 +42,7 @@ mkdir -p $GEOIPUPDATE_DB_DIR
 
 while true; do
     echo "======$(date "+%Y-%m-%d %H:%M:%S")：【正在下载更新geoip数据至$GEOIPUPDATE_DB_DIR】======"
-    /usr/bin/geoipupdate $flags 1>$log_file
+    /usr/bin/geoipupdate $flags 2>&1 | awk '{print "[GeoIP Update] " $0}'
     if [ "$frequency" -eq 0 ]; then
         break
     fi

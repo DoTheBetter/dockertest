@@ -17,8 +17,6 @@ ENV TZ=Asia/Shanghai \
 	#https://caddyserver.com/docs/conventions#file-locations
 	XDG_CONFIG_HOME=/config \
 	XDG_DATA_HOME=/data \
-	# Caddy 日志等级: DEBUG, INFO, WARN, ERROR
-	CADDY_LOG_LEVEL=WARN \
 	#https://github.com/lucaslorentz/caddy-docker-proxy
 	CADDY_DOCKER_CADDYFILE_PATH=/config/Caddyfile \
 	CADDY_DOCKER_LOG_LEVEL=WARN \
