@@ -13,6 +13,7 @@ FROM alpine:3.24
 ARG S6_VER=3.2.3.0
 
 ENV TZ=Asia/Shanghai \
+    S6_VERBOSITY=1 \
 	#https://caddyserver.com/docs/conventions#file-locations
 	XDG_CONFIG_HOME=/config \
 	XDG_DATA_HOME=/data \

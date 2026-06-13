@@ -14,12 +14,12 @@ echo "2.配置Caddy2"
 [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 mkdir -p /usr/share/caddy
-cp /caddy/index.html /usr/share/caddy/index.html
+cp /etc/caddy/index.html /usr/share/caddy/index.html
 # 复制默认配置文件
-cp -f /caddy/Caddyfile.default $CADDY_DOCKER_CADDYFILE_PATH.default
+cp -f /etc/caddy/Caddyfile.default $CADDY_DOCKER_CADDYFILE_PATH.default
 if [ ! -e $CADDY_DOCKER_CADDYFILE_PATH ];then
-    cp /caddy/Caddyfile.default $CADDY_DOCKER_CADDYFILE_PATH
+    cp /etc/caddy/Caddyfile.default $CADDY_DOCKER_CADDYFILE_PATH
     echo "==>Caddyfile文件已建立。"
-else 
+else
 	echo "==>Caddyfile文件已存在。"
 fi
